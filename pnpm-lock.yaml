@@ -8,6 +8,9 @@ importers:
 
   .:
     devDependencies:
+      eslint:
+        specifier: ^9.20.1
+        version: 9.39.5(jiti@2.7.0)
       prettier:
         specifier: ^3.5.0
         version: 3.9.6
@@ -133,6 +136,9 @@ importers:
       '@types/node':
         specifier: ^22.13.4
         version: 22.20.1
+      eslint:
+        specifier: ^9.20.1
+        version: 9.39.5(jiti@2.7.0)
       typescript:
         specifier: ^5.8.0
         version: 5.9.3
@@ -177,6 +183,9 @@ importers:
       '@types/node':
         specifier: ^22.13.4
         version: 22.20.1
+      eslint:
+        specifier: ^9.20.1
+        version: 9.39.5(jiti@2.7.0)
       typescript:
         specifier: ^5.8.0
         version: 5.9.3
@@ -196,6 +205,9 @@ importers:
       '@musicmotion/typescript-config':
         specifier: workspace:*
         version: link:../../tooling/typescript
+      eslint:
+        specifier: ^9.20.1
+        version: 9.39.5(jiti@2.7.0)
       typescript:
         specifier: ^5.8.0
         version: 5.9.3
@@ -245,6 +257,9 @@ importers:
       '@types/react-dom':
         specifier: ^19.0.4
         version: 19.2.4(@types/react@19.2.18)
+      eslint:
+        specifier: ^9.20.1
+        version: 9.39.5(jiti@2.7.0)
       tailwindcss:
         specifier: ^4.0.9
         version: 4.3.3
@@ -288,18 +303,27 @@ importers:
       '@types/react-dom':
         specifier: ^19.0.4
         version: 19.2.4(@types/react@19.2.18)
+      eslint:
+        specifier: ^9.20.1
+        version: 9.39.5(jiti@2.7.0)
       typescript:
         specifier: ^5.8.0
         version: 5.9.3
 
   tooling/eslint:
     dependencies:
+      '@eslint/js':
+        specifier: ^9.20.0
+        version: 9.39.5
       '@typescript-eslint/eslint-plugin':
         specifier: ^8.24.0
         version: 8.67.0(@typescript-eslint/parser@8.67.0(eslint@9.39.5(jiti@2.7.0))(typescript@5.9.3))(eslint@9.39.5(jiti@2.7.0))(typescript@5.9.3)
       '@typescript-eslint/parser':
         specifier: ^8.24.0
         version: 8.67.0(eslint@9.39.5(jiti@2.7.0))(typescript@5.9.3)
+      eslint:
+        specifier: ^9.20.1
+        version: 9.39.5(jiti@2.7.0)
       eslint-config-prettier:
         specifier: ^10.0.1
         version: 10.1.8(eslint@9.39.5(jiti@2.7.0))

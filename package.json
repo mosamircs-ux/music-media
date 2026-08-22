@@ -13,6 +13,7 @@
     "db:push": "turbo run db:push"
   },
   "devDependencies": {
+    "eslint": "^9.20.1",
     "prettier": "^3.5.0",
     "turbo": "^2.4.4",
     "typescript": "^5.8.0"
