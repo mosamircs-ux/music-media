@@ -1,0 +1,62 @@
+{
+  "app": {
+    "name": "MusicMotion",
+    "tagline": "Turn licensed music into viral AI videos with synchronized captions"
+  },
+  "nav": {
+    "home": "Home",
+    "projects": "My Projects",
+    "explore": "Explore Music",
+    "create": "New Project",
+    "settings": "Settings"
+  },
+  "common": {
+    "loading": "Loading...",
+    "save": "Save",
+    "cancel": "Cancel",
+    "delete": "Delete",
+    "edit": "Edit",
+    "preview": "Preview",
+    "export": "Export Video",
+    "back": "Back",
+    "next": "Next",
+    "search": "Search...",
+    "error": "An error occurred",
+    "retry": "Retry"
+  },
+  "music": {
+    "searchPlaceholder": "Search licensed tracks by title, genre, mood...",
+    "selectTrack": "Select Track",
+    "uploadTrack": "Upload Your Own Audio",
+    "licensedBadge": "Licensed & Cleared",
+    "duration": "Duration",
+    "bpm": "BPM",
+    "artist": "Artist",
+    "trimSection": "Trim Music Section",
+    "startTime": "Start Time",
+    "endTime": "End Time",
+    "selectionDuration": "Selected Duration"
+  },
+  "captions": {
+    "title": "Captions & Lyrics",
+    "addCaption": "Add Caption",
+    "placeholder": "Enter caption text...",
+    "timing": "Timing",
+    "animation": "Animation Style",
+    "position": "Position"
+  },
+  "scenes": {
+    "title": "AI Visual Scenes",
+    "generatePrompt": "Describe the visual vibe...",
+    "generateButton": "Generate Scene",
+    "generating": "Creating AI Scene...",
+    "transitions": "Transitions"
+  },
+  "editor": {
+    "timeline": "Timeline",
+    "videoPreview": "Video Preview",
+    "aspectRatio": "Aspect Ratio",
+    "renderTitle": "Exporting Your Video",
+    "renderProgress": "Rendering in progress..."
+  }
+}

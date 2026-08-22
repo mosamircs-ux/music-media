@@ -1,0 +1,47 @@
+{
+  "name": "web",
+  "version": "0.1.0",
+  "private": true,
+  "scripts": {
+    "dev": "next dev",
+    "build": "next build",
+    "start": "next start",
+    "lint": "next lint",
+    "typecheck": "tsc --noEmit"
+  },
+  "dependencies": {
+    "@musicmotion/ai": "workspace:*",
+    "@musicmotion/database": "workspace:*",
+    "@musicmotion/music": "workspace:*",
+    "@musicmotion/shared": "workspace:*",
+    "@musicmotion/ui": "workspace:*",
+    "@musicmotion/video": "workspace:*",
+    "class-variance-authority": "^0.7.1",
+    "clsx": "^2.1.1",
+    "lucide-react": "^1.16.0",
+    "next": "15.2.0",
+    "next-intl": "^3.26.5",
+    "next-themes": "^0.4.6",
+    "react": "^19.0.0",
+    "react-dom": "^19.0.0",
+    "react-hook-form": "^7.54.2",
+    "remotion": "^4.0.260",
+    "@remotion/player": "^4.0.260",
+    "tailwind-merge": "^3.0.2",
+    "wavesurfer.js": "^7.8.15",
+    "zod": "^3.24.2",
+    "zustand": "^5.0.3"
+  },
+  "devDependencies": {
+    "@musicmotion/eslint-config": "workspace:*",
+    "@musicmotion/typescript-config": "workspace:*",
+    "@tailwindcss/postcss": "^4.0.9",
+    "@types/node": "^22.13.4",
+    "@types/react": "^19.0.10",
+    "@types/react-dom": "^19.0.4",
+    "eslint": "^9.20.1",
+    "postcss": "^8.5.2",
+    "tailwindcss": "^4.0.9",
+    "typescript": "^5.8.0"
+  }
+}

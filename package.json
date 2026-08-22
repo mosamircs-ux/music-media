@@ -1,0 +1,24 @@
+{
+  "name": "musicmotion",
+  "private": true,
+  "scripts": {
+    "build": "turbo run build",
+    "dev": "turbo run dev",
+    "lint": "turbo run lint",
+    "typecheck": "turbo run typecheck",
+    "test": "turbo run test",
+    "format": "prettier --write \"**/*.{ts,tsx,md,json}\"",
+    "format:check": "prettier --check \"**/*.{ts,tsx,md,json}\"",
+    "db:generate": "turbo run db:generate",
+    "db:push": "turbo run db:push"
+  },
+  "devDependencies": {
+    "prettier": "^3.5.0",
+    "turbo": "^2.4.4",
+    "typescript": "^5.8.0"
+  },
+  "packageManager": "pnpm@10.5.2",
+  "engines": {
+    "node": ">=20.0.0"
+  }
+}

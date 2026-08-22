@@ -1,0 +1,25 @@
+# Dockerfile for BullMQ & Remotion Rendering Worker with FFmpeg
+FROM node:22-alpine AS base
+
+# Install FFmpeg and Chromium for Remotion headless rendering
+RUN apk add --no-cache \
+    ffmpeg \
+    chromium \
+    nss \
+    freetype \
+    harfbuzz \
+    ca-certificates \
+    ttf-freefont
+
+ENV PUPPETEER_SKIP_CHROMIUM_DOWNLOAD=true \
+    PUPPETEER_EXECUTABLE_PATH=/usr/bin/chromium-browser
+
+ENV PNPM_HOME="/pnpm"
+ENV PATH="$PNPM_HOME:$PATH"
+RUN corepack enable
+
+WORKDIR /app
+COPY . .
+RUN pnpm install
+
+CMD ["node", "packages/video/dist/render/worker.js"]

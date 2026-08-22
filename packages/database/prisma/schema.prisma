@@ -1,0 +1,157 @@
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+enum ProjectStatus {
+  DRAFT
+  READY
+  RENDERING
+  COMPLETED
+  FAILED
+}
+
+enum MusicProviderType {
+  JAMENDO
+  FREESOUND
+  UPLOAD
+  CUSTOM
+}
+
+enum SceneStatus {
+  IDLE
+  GENERATING
+  COMPLETED
+  FAILED
+}
+
+enum RenderJobStatus {
+  QUEUED
+  PROCESSING
+  RENDERING
+  ENCODING
+  COMPLETED
+  FAILED
+}
+
+model Project {
+  id             String          @id @default(uuid())
+  title          String
+  status         ProjectStatus   @default(DRAFT)
+  locale         String          @default("en")
+  trackSelection TrackSelection?
+  captions       Caption[]
+  scenes         Scene[]
+  renderJobs     RenderJob[]
+  videoWidth     Int             @default(1080)
+  videoHeight    Int             @default(1920)
+  videoFps       Int             @default(30)
+  aspectRatio    String          @default("9:16")
+  createdAt      DateTime        @default(now())
+  updatedAt      DateTime        @updatedAt
+
+  @@index([status])
+  @@index([createdAt])
+}
+
+model Track {
+  id                  String            @id @default(uuid())
+  provider            MusicProviderType @default(JAMENDO)
+  externalId          String
+  title               String
+  artist              String
+  album               String?
+  duration            Float
+  audioUrl            String
+  waveformUrl         String?
+  coverArtUrl         String?
+  bpm                 Int?
+  tags                String[]          @default([])
+  licenseType         String
+  licenseUrl          String?
+  attributionRequired Boolean           @default(false)
+  commercialAllowed   Boolean           @default(false)
+  createdAt           DateTime          @default(now())
+  updatedAt           DateTime          @updatedAt
+  selections          TrackSelection[]
+
+  @@unique([provider, externalId])
+  @@index([artist])
+  @@index([title])
+}
+
+model TrackSelection {
+  id              String   @id @default(uuid())
+  projectId       String   @unique
+  project         Project  @relation(fields: [projectId], references: [id], onDelete: Cascade)
+  trackId         String
+  track           Track    @relation(fields: [trackId], references: [id], onDelete: Restrict)
+  startTime       Float    @default(0)
+  endTime         Float
+  fadeInDuration  Float?   @default(0)
+  fadeOutDuration Float?   @default(0)
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+}
+
+model Caption {
+  id              String   @id @default(uuid())
+  projectId       String
+  project         Project  @relation(fields: [projectId], references: [id], onDelete: Cascade)
+  startTime       Float
+  endTime         Float
+  text            String
+  fontFamily      String?  @default("Inter")
+  fontSize        Float?   @default(48)
+  textColor       String?  @default("#ffffff")
+  backgroundColor String?
+  strokeColor     String?  @default("#000000")
+  strokeWidth     Float?   @default(2)
+  position        String?  @default("bottom")
+  animation       String?  @default("pop")
+  order           Int      @default(0)
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+
+  @@index([projectId, startTime])
+}
+
+model Scene {
+  id              String      @id @default(uuid())
+  projectId       String
+  project         Project     @relation(fields: [projectId], references: [id], onDelete: Cascade)
+  prompt          String
+  enhancedPrompt  String?
+  imageUrl        String?
+  videoUrl        String?
+  order           Int         @default(0)
+  duration        Float       @default(3.0)
+  transitionType  String?     @default("fade")
+  transitionDur   Float?      @default(0.5)
+  status          SceneStatus @default(IDLE)
+  createdAt       DateTime    @default(now())
+  updatedAt       DateTime    @updatedAt
+
+  @@index([projectId, order])
+}
+
+model RenderJob {
+  id          String          @id @default(uuid())
+  projectId   String
+  project     Project         @relation(fields: [projectId], references: [id], onDelete: Cascade)
+  status      RenderJobStatus @default(QUEUED)
+  progress    Int             @default(0)
+  outputUrl   String?
+  error       String?
+  startedAt   DateTime?
+  completedAt DateTime?
+  createdAt   DateTime        @default(now())
+  updatedAt   DateTime        @updatedAt
+
+  @@index([projectId])
+  @@index([status])
+}

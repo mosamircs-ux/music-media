@@ -1,0 +1,77 @@
+version: '3.8'
+
+services:
+  # PostgreSQL Database for Prisma ORM
+  postgres:
+    image: postgres:16-alpine
+    container_name: musicmotion-postgres
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: musicmotion
+      POSTGRES_PASSWORD: musicmotion_secret
+      POSTGRES_DB: musicmotion
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U musicmotion -d musicmotion"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  # Redis for BullMQ Queue & Fast Caching
+  redis:
+    image: redis:7-alpine
+    container_name: musicmotion-redis
+    restart: unless-stopped
+    ports:
+      - "6379:6379"
+    volumes:
+      - redis_data:/data
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  # Next.js Web Application (Optional containerized mode)
+  web:
+    build:
+      context: ..
+      dockerfile: docker/Dockerfile.web
+    container_name: musicmotion-web
+    restart: unless-stopped
+    ports:
+      - "3000:3000"
+    environment:
+      - NODE_ENV=production
+      - DATABASE_URL=postgresql://musicmotion:musicmotion_secret@postgres:5432/musicmotion?schema=public
+      - REDIS_URL=redis://redis:6379
+    depends_on:
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+
+  # Video Rendering Worker with Remotion + FFmpeg
+  worker:
+    build:
+      context: ..
+      dockerfile: docker/Dockerfile.worker
+    container_name: musicmotion-worker
+    restart: unless-stopped
+    environment:
+      - NODE_ENV=production
+      - DATABASE_URL=postgresql://musicmotion:musicmotion_secret@postgres:5432/musicmotion?schema=public
+      - REDIS_URL=redis://redis:6379
+      - WORKER_CONCURRENCY=2
+    depends_on:
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+
+volumes:
+  postgres_data:
+  redis_data:
