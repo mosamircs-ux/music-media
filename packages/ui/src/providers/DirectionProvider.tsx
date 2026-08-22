@@ -4,7 +4,7 @@ import * as React from "react";
 import type { Direction, Locale } from "@musicmotion/shared";
 import { getDirection } from "@musicmotion/shared";
 
-interface DirectionContextValue {
+export interface DirectionContextValue {
   locale: Locale;
   direction: Direction;
   isRtl: boolean;

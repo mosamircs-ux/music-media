@@ -1,7 +1,7 @@
 "use client";
 
-import { useDirectionContext } from "../providers/DirectionProvider";
+import { useDirectionContext, type DirectionContextValue } from "../providers/DirectionProvider";
 
-export function useDirection() {
+export function useDirection(): DirectionContextValue {
   return useDirectionContext();
 }

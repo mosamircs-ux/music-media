@@ -2,12 +2,11 @@
 
 import { useTranslations } from "next-intl";
 import { Link } from "@/i18n/routing";
-import { FolderKanban, Plus, Video, Clock, CheckCircle2, AlertCircle } from "lucide-react";
+import { FolderKanban, Plus, Video, Clock } from "lucide-react";
 import { Button, Card, CardContent, CardHeader, CardTitle, Badge } from "@musicmotion/ui";
 
 export default function ProjectsPage() {
   const t = useTranslations("nav");
-  const commonT = useTranslations("common");
 
   const mockProjects = [
     {

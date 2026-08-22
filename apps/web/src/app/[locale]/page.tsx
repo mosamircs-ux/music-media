@@ -5,26 +5,19 @@ import { Link } from "@/i18n/routing";
 import {
   Music2,
   Sparkles,
-  Layers,
   Video,
   AudioWaveform,
   Captions,
   ShieldCheck,
   ArrowRight,
   Play,
-  Share2,
   Sliders,
   CheckCircle2,
-  Zap,
 } from "lucide-react";
 import { Button, Card, CardContent, CardHeader, CardTitle, Badge } from "@musicmotion/ui";
 
 export default function LandingPage() {
   const t = useTranslations("app");
-  const commonT = useTranslations("common");
-  const musicT = useTranslations("music");
-  const captionsT = useTranslations("captions");
-  const scenesT = useTranslations("scenes");
 
   const workflowSteps = [
     {

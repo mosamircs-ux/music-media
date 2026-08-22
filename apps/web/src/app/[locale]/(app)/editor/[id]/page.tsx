@@ -9,11 +9,8 @@ import {
   Sparkles,
   Captions as CaptionsIcon,
   Video,
-  Layers,
   Plus,
   Trash2,
-  Download,
-  Settings2,
   Music2,
   RefreshCw,
 } from "lucide-react";
@@ -22,19 +19,15 @@ import { useProjectStore } from "@/stores/projectStore";
 import { formatTime } from "@musicmotion/shared";
 
 export default function EditorStudioPage() {
-  const t = useTranslations("editor");
-  const musicT = useTranslations("music");
-  const captionsT = useTranslations("captions");
   const scenesT = useTranslations("scenes");
+  const captionsT = useTranslations("captions");
 
   const {
     selectedTrack,
     trackSelection,
     captions,
     scenes,
-    videoConfig,
     isPlaying,
-    currentTime,
     updateSelection,
     addCaption,
     removeCaption,

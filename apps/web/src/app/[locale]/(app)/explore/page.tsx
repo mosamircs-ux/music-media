@@ -2,7 +2,7 @@
 
 import * as React from "react";
 import { useTranslations } from "next-intl";
-import { Search, Music, Play, Pause, Scissors, Sparkles, ShieldCheck } from "lucide-react";
+import { Search, Music, Play, Pause, Scissors, ShieldCheck } from "lucide-react";
 import { Button, Card, CardContent, Input, Badge } from "@musicmotion/ui";
 import type { Track } from "@musicmotion/shared";
 import { useProjectStore } from "@/stores/projectStore";
@@ -10,7 +10,6 @@ import { useRouter } from "@/i18n/routing";
 
 export default function ExploreMusicPage() {
   const t = useTranslations("music");
-  const commonT = useTranslations("common");
   const router = useRouter();
   const selectTrack = useProjectStore((state) => state.selectTrack);
 
