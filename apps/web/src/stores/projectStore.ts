@@ -31,7 +31,7 @@ interface ProjectState {
   updateScene: (id: string, updates: Partial<Scene>) => void;
   removeScene: (id: string) => void;
   setIsPlaying: (isPlaying: boolean) => void;
-  setCurrentTime: (currentTime: number) => void;
+  setCurrentTime: (currentTime: number | ((prev: number) => number)) => void;
   setVideoConfig: (config: Partial<VideoConfig>) => void;
 }
 
@@ -190,7 +190,10 @@ export const useProjectStore = create<ProjectState>((set, get) => ({
   },
 
   setIsPlaying: (isPlaying: boolean) => set({ isPlaying }),
-  setCurrentTime: (currentTime: number) => set({ currentTime }),
+  setCurrentTime: (currentTime: number | ((prev: number) => number)) =>
+    set((state) => ({
+      currentTime: typeof currentTime === "function" ? currentTime(state.currentTime) : currentTime,
+    })),
   setVideoConfig: (config: Partial<VideoConfig>) =>
     set((state) => ({
       videoConfig: { ...state.videoConfig, ...config },

@@ -14,16 +14,16 @@ export const LicenseInfoSchema = z.object({
 });
 
 export const TrackSchema = z.object({
-  id: z.string().uuid(),
+  id: z.string(),
   provider: MusicProviderTypeSchema,
   externalId: z.string().min(1),
   title: z.string().min(1),
   artist: z.string().min(1),
   album: z.string().optional(),
   duration: z.number().positive(),
-  audioUrl: z.string().url(),
-  waveformUrl: z.string().url().optional(),
-  coverArtUrl: z.string().url().optional(),
+  audioUrl: z.string(),
+  waveformUrl: z.string().optional(),
+  coverArtUrl: z.string().optional(),
   bpm: z.number().int().positive().optional(),
   tags: z.array(z.string()).optional(),
   license: LicenseInfoSchema,
@@ -40,22 +40,27 @@ export const TimeRangeSchema = z
   });
 
 export const TrackSelectionSchema = z.object({
-  id: z.string().uuid(),
-  projectId: z.string().uuid(),
-  trackId: z.string().uuid(),
+  id: z.string(),
+  projectId: z.string(),
+  trackId: z.string(),
   track: TrackSchema.optional(),
   startTime: z.number().min(0),
   endTime: z.number().positive(),
   fadeInDuration: z.number().min(0).optional(),
   fadeOutDuration: z.number().min(0).optional(),
+  volume: z.number().min(0).max(1).optional(),
 });
 
 export const CaptionPositionSchema = z.enum(["top", "center", "bottom"]);
-export const CaptionAnimationSchema = z.enum(["none", "fade", "pop", "typewriter", "karaoke"]);
+export const CaptionAnimationSchema = z.enum(["none", "fade", "pop", "typewriter", "karaoke", "bounce"]);
+export const CaptionAlignmentSchema = z.enum(["left", "center", "right"]);
+export const CaptionFontWeightSchema = z.enum(["normal", "medium", "semibold", "bold", "extrabold"]);
 
 export const CaptionStyleSchema = z.object({
   fontFamily: z.string(),
   fontSize: z.number().positive(),
+  fontWeight: CaptionFontWeightSchema.default("bold"),
+  alignment: CaptionAlignmentSchema.default("center"),
   textColor: z.string(),
   backgroundColor: z.string().optional(),
   strokeColor: z.string().optional(),
@@ -66,13 +71,25 @@ export const CaptionStyleSchema = z.object({
 });
 
 export const CaptionSchema = z.object({
-  id: z.string().uuid(),
-  projectId: z.string().uuid(),
+  id: z.string(),
+  projectId: z.string(),
   startTime: z.number().min(0),
   endTime: z.number().positive(),
   text: z.string().min(1),
   style: CaptionStyleSchema.partial().optional(),
 });
+
+export const VisualStyleSchema = z.enum([
+  "Cinematic",
+  "Anime",
+  "Realistic",
+  "Dreamy",
+  "Dark",
+  "Retro",
+  "Fantasy",
+  "Minimal",
+  "Music Video",
+]);
 
 export const TransitionTypeSchema = z.enum([
   "fade",
@@ -81,6 +98,7 @@ export const TransitionTypeSchema = z.enum([
   "slide_right",
   "zoom_in",
   "zoom_out",
+  "glitch",
   "cut",
 ]);
 
@@ -90,12 +108,13 @@ export const TransitionSchema = z.object({
 });
 
 export const SceneSchema = z.object({
-  id: z.string().uuid(),
-  projectId: z.string().uuid(),
+  id: z.string(),
+  projectId: z.string(),
   prompt: z.string().min(1),
   enhancedPrompt: z.string().optional(),
-  imageUrl: z.string().url().optional(),
-  videoUrl: z.string().url().optional(),
+  visualStyle: VisualStyleSchema.optional(),
+  imageUrl: z.string().optional(),
+  videoUrl: z.string().optional(),
   order: z.number().int().min(0),
   duration: z.number().positive(),
   transition: TransitionSchema.optional(),
@@ -110,10 +129,13 @@ export const VideoConfigSchema = z.object({
   fps: z.number().int().positive().default(30),
   aspectRatio: AspectRatioSchema.default("9:16"),
   duration: z.number().positive(),
+  resolution: z.enum(["720p", "1080p", "4k"]).default("1080p"),
+  codec: z.enum(["h264", "h265"]).default("h264"),
+  watermark: z.boolean().default(false),
 });
 
 export const ProjectSchema = z.object({
-  id: z.string().uuid(),
+  id: z.string(),
   title: z.string().min(1),
   status: z.enum(["draft", "ready", "rendering", "completed", "failed"]),
   locale: LocaleSchema.default("en"),
@@ -123,4 +145,6 @@ export const ProjectSchema = z.object({
   videoConfig: VideoConfigSchema,
   createdAt: z.string(),
   updatedAt: z.string(),
+  thumbnailUrl: z.string().optional(),
+  outputVideoUrl: z.string().optional(),
 });

@@ -36,6 +36,7 @@ export interface Track {
 export interface SearchTracksParams {
   query?: string;
   tags?: string[];
+  genre?: string;
   bpmMin?: number;
   bpmMax?: number;
   limit?: number;
@@ -65,17 +66,22 @@ export interface TrackSelection {
   endTime: number;
   fadeInDuration?: number;
   fadeOutDuration?: number;
+  volume?: number; // 0 to 1
 }
 
 /**
  * Captions & Timing
  */
 export type CaptionPosition = "top" | "center" | "bottom";
-export type CaptionAnimation = "none" | "fade" | "pop" | "typewriter" | "karaoke";
+export type CaptionAnimation = "none" | "fade" | "pop" | "typewriter" | "karaoke" | "bounce";
+export type CaptionAlignment = "left" | "center" | "right";
+export type CaptionFontWeight = "normal" | "medium" | "semibold" | "bold" | "extrabold";
 
 export interface CaptionStyle {
   fontFamily: string;
   fontSize: number;
+  fontWeight: CaptionFontWeight;
+  alignment: CaptionAlignment;
   textColor: string;
   backgroundColor?: string;
   strokeColor?: string;
@@ -95,9 +101,28 @@ export interface Caption {
 }
 
 /**
- * AI Visual Scenes & Transitions
+ * AI Visual Styles & Scene Generation
  */
-export type TransitionType = "fade" | "dissolve" | "slide_left" | "slide_right" | "zoom_in" | "zoom_out" | "cut";
+export type VisualStyle =
+  | "Cinematic"
+  | "Anime"
+  | "Realistic"
+  | "Dreamy"
+  | "Dark"
+  | "Retro"
+  | "Fantasy"
+  | "Minimal"
+  | "Music Video";
+
+export type TransitionType =
+  | "fade"
+  | "dissolve"
+  | "slide_left"
+  | "slide_right"
+  | "zoom_in"
+  | "zoom_out"
+  | "glitch"
+  | "cut";
 
 export interface Transition {
   type: TransitionType;
@@ -109,6 +134,7 @@ export interface Scene {
   projectId: string;
   prompt: string;
   enhancedPrompt?: string;
+  visualStyle?: VisualStyle;
   imageUrl?: string;
   videoUrl?: string;
   order: number;
@@ -121,6 +147,8 @@ export interface Scene {
  * Video Rendering & Project Settings
  */
 export type AspectRatio = "9:16" | "16:9" | "1:1";
+export type VideoResolution = "720p" | "1080p" | "4k";
+export type VideoCodec = "h264" | "h265";
 
 export interface VideoConfig {
   width: number;
@@ -128,6 +156,9 @@ export interface VideoConfig {
   fps: number;
   aspectRatio: AspectRatio;
   duration: number; // calculated from selection duration
+  resolution?: VideoResolution;
+  codec?: VideoCodec;
+  watermark?: boolean;
 }
 
 export type ProjectStatus = "draft" | "ready" | "rendering" | "completed" | "failed";
@@ -143,6 +174,8 @@ export interface Project {
   videoConfig: VideoConfig;
   createdAt: string;
   updatedAt: string;
+  thumbnailUrl?: string;
+  outputVideoUrl?: string;
 }
 
 export type RenderJobStatus = "queued" | "processing" | "rendering" | "encoding" | "completed" | "failed";
@@ -156,4 +189,62 @@ export interface RenderJob {
   error?: string;
   createdAt: string;
   updatedAt: string;
+}
+
+/**
+ * Video Templates
+ */
+export type TemplateCategory =
+  | "all"
+  | "reels"
+  | "lyrics"
+  | "visualizer"
+  | "podcast"
+  | "lofi"
+  | "cinematic";
+
+export interface VideoTemplate {
+  id: string;
+  title: string;
+  description: string;
+  category: TemplateCategory;
+  thumbnailUrl: string;
+  previewVideoUrl?: string;
+  scenesCount: number;
+  defaultDuration: number;
+  visualStyle: VisualStyle;
+  aspectRatio: AspectRatio;
+  musicGenre: string;
+  tags: string[];
+  rating: number;
+  downloadsCount: number;
+  isTrending?: boolean;
+}
+
+/**
+ * User & Account & Billing
+ */
+export interface UserProfile {
+  id: string;
+  name: string;
+  email: string;
+  avatarUrl?: string;
+  tier: "free" | "creator" | "studio";
+  creditsTotal: number;
+  creditsRemaining: number;
+  storageUsedBytes: number;
+  storageLimitBytes: number;
+  createdAt: string;
+}
+
+export interface PricingPlan {
+  id: "free" | "creator" | "studio";
+  name: string;
+  description: string;
+  priceMonthly: number;
+  priceAnnualMonthly: number; // discounted rate
+  creditsMonthly: number;
+  features: string[];
+  isPopular?: boolean;
+  ctaText: string;
 }

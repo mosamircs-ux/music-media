@@ -6,12 +6,13 @@ import { routing } from "@/i18n/routing";
 import { ThemeProvider, DirectionProvider } from "@musicmotion/ui";
 import { getDirection, type Locale } from "@musicmotion/shared";
 import { Navbar } from "@/components/Navbar";
+import { Footer } from "@/components/Footer";
 import "../globals.css";
 
 export const metadata: Metadata = {
-  title: "MusicMotion — Licensed Music to AI Viral Videos",
+  title: "MusicMotion — Turn Music Into Visual Stories",
   description:
-    "Transform legally licensed music into synchronized, high-impact vertical videos with AI visual scenes and animated captions.",
+    "Choose a song, select the exact moment, add captions, and generate an AI-powered music video with Remotion and licensed tracks.",
 };
 
 export default async function LocaleLayout({
@@ -33,7 +34,7 @@ export default async function LocaleLayout({
 
   return (
     <html lang={validLocale} dir={dir} suppressHydrationWarning>
-      <body className="min-h-screen bg-background text-foreground antialiased selection:bg-rose-500 selection:text-white">
+      <body className="min-h-screen bg-background text-foreground antialiased selection:bg-rose-500 selection:text-white flex flex-col">
         <ThemeProvider
           attribute="class"
           defaultTheme="dark"
@@ -45,6 +46,7 @@ export default async function LocaleLayout({
               <div className="relative flex min-h-screen flex-col">
                 <Navbar />
                 <main className="flex-1">{children}</main>
+                <Footer />
               </div>
             </NextIntlClientProvider>
           </DirectionProvider>
