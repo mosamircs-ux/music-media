@@ -47,6 +47,7 @@ export default function CreateWorkspacePage() {
   const router = useRouter();
 
   const {
+    currentProject,
     selectedTrack,
     trackSelection,
     captions,

@@ -7,7 +7,8 @@
   "exports": {
     ".": "./src/index.ts",
     "./compositions": "./src/compositions/index.ts",
-    "./render": "./src/render/index.ts"
+    "./render": "./src/render/index.ts",
+    "./generation": "./src/generation/index.ts"
   },
   "scripts": {
     "typecheck": "tsc --noEmit",

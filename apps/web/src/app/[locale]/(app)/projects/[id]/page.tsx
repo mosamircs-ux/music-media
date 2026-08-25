@@ -45,6 +45,7 @@ export default function ProjectEditorPage() {
   const router = useRouter();
 
   const {
+    currentProject,
     selectedTrack,
     trackSelection,
     captions,
