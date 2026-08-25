@@ -5,6 +5,7 @@ import { useTranslations } from "next-intl";
 import { Search, Music, Play, Pause, Scissors, ShieldCheck } from "lucide-react";
 import { Button, Card, CardContent, Input, Badge } from "@musicmotion/ui";
 import type { Track } from "@musicmotion/shared";
+import { MOCK_TRACKS } from "@/lib/mockData";
 import { useProjectStore } from "@/stores/projectStore";
 import { useRouter } from "@/i18n/routing";
 
@@ -16,66 +17,7 @@ export default function ExploreMusicPage() {
   const [searchQuery, setSearchQuery] = React.useState("");
   const [playingTrackId, setPlayingTrackId] = React.useState<string | null>(null);
 
-  // Curated demo licensed tracks (Jamendo licensed)
-  const mockTracks: Track[] = [
-    {
-      id: "jamendo-101",
-      provider: "jamendo",
-      externalId: "101",
-      title: "Neon Cyberpunk Drift",
-      artist: "Alex Stoner",
-      album: "Future Echoes",
-      duration: 184,
-      audioUrl: "https://prod-1.storage.jamendo.com/download/track/101/mp32/",
-      coverArtUrl: "https://images.unsplash.com/photo-1518709268805-4e9042af9f23?auto=format&fit=crop&w=300&q=80",
-      bpm: 128,
-      tags: ["Synthwave", "Cyberpunk", "Electronic"],
-      license: {
-        type: "Creative Commons BY-NC-SA 3.0",
-        url: "https://creativecommons.org/licenses/by-nc-sa/3.0/",
-        attributionRequired: true,
-        commercialAllowed: false,
-      },
-    },
-    {
-      id: "jamendo-102",
-      provider: "jamendo",
-      externalId: "102",
-      title: "Lo-Fi Midnight Chill",
-      artist: "Luna Beats",
-      album: "Coffee & Code",
-      duration: 142,
-      audioUrl: "https://prod-1.storage.jamendo.com/download/track/102/mp32/",
-      coverArtUrl: "https://images.unsplash.com/photo-1511671782779-c97d3d27a1d4?auto=format&fit=crop&w=300&q=80",
-      bpm: 85,
-      tags: ["Lo-Fi", "Chillhop", "Relaxing"],
-      license: {
-        type: "Creative Commons BY 4.0",
-        url: "https://creativecommons.org/licenses/by/4.0/",
-        attributionRequired: true,
-        commercialAllowed: true,
-      },
-    },
-    {
-      id: "jamendo-103",
-      provider: "jamendo",
-      externalId: "103",
-      title: "Epic Cinematic Trailer",
-      artist: "Nordic Symphony",
-      album: "Valhalla",
-      duration: 210,
-      audioUrl: "https://prod-1.storage.jamendo.com/download/track/103/mp32/",
-      coverArtUrl: "https://images.unsplash.com/photo-1508700115892-45ecd05ae2ad?auto=format&fit=crop&w=300&q=80",
-      bpm: 140,
-      tags: ["Cinematic", "Orchestral", "Epic"],
-      license: {
-        type: "Creative Commons BY-SA 3.0",
-        url: "https://creativecommons.org/licenses/by-sa/3.0/",
-        attributionRequired: true,
-        commercialAllowed: false,
-      },
-    },
-  ];
+  const mockTracks: Track[] = MOCK_TRACKS;
 
   const handleSelectTrack = (track: Track) => {
     selectTrack(track);

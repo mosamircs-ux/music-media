@@ -5,9 +5,17 @@ export type Locale = "en" | "ar";
 export type Direction = "ltr" | "rtl";
 
 /**
- * Music Track & Provider
+ * Music Track & Provider Types
  */
-export type MusicProviderType = "jamendo" | "freesound" | "upload" | "custom";
+export type MusicProviderType =
+  | "spotify"
+  | "apple"
+  | "licensed"
+  | "user-upload"
+  | "jamendo"
+  | "freesound"
+  | "upload"
+  | "custom";
 
 export interface LicenseInfo {
   type: string;
@@ -15,23 +23,63 @@ export interface LicenseInfo {
   attributionRequired: boolean;
   commercialAllowed: boolean;
   rawText?: string;
+  notice?: string;
 }
 
-export interface Track {
+export interface TrackAvailability {
+  isAvailable: boolean;
+  isAvailableForVideo: boolean;
+  reason?: string;
+  previewAvailable: boolean;
+}
+
+export interface Artist {
+  id: string;
+  name: string;
+  genre?: string;
+  avatarUrl?: string;
+  monthlyListeners?: string;
+  externalUrl?: string;
+  tracksCount?: number;
+}
+
+export interface Album {
+  id: string;
+  title: string;
+  artist: string;
+  artists?: string[];
+  coverArtUrl?: string;
+  albumArt?: string;
+  releaseYear?: number;
+  genre?: string;
+  totalTracks?: number;
+  externalUrl?: string;
+}
+
+export interface NormalizedTrack {
   id: string;
   provider: MusicProviderType;
   externalId: string;
   title: string;
   artist: string;
+  artists: string[];
   album?: string;
+  albumArt?: string;
+  coverArtUrl?: string; // backwards compatibility alias for albumArt
   duration: number; // in seconds
-  audioUrl: string;
+  previewUrl?: string;
+  audioUrl?: string; // backwards compatibility alias for previewUrl
   waveformUrl?: string;
-  coverArtUrl?: string;
   bpm?: number;
   tags?: string[];
-  license: LicenseInfo;
+  isAvailableForVideo: boolean;
+  licenseInfo: LicenseInfo;
+  license: LicenseInfo; // backwards compatibility alias for licenseInfo
+  lyrics?: string;
 }
+
+// Backward compatibility Track alias
+export type Track = NormalizedTrack;
 
 export interface SearchTracksParams {
   query?: string;
@@ -41,13 +89,21 @@ export interface SearchTracksParams {
   bpmMax?: number;
   limit?: number;
   offset?: number;
+  provider?: MusicProviderType;
 }
 
+export type SearchOptions = SearchTracksParams;
+
 export interface SearchTracksResult {
-  tracks: Track[];
+  tracks: NormalizedTrack[];
   total: number;
   hasMore: boolean;
+  page?: number;
+  provider?: MusicProviderType;
 }
+
+export type SearchResult = SearchTracksResult;
+
 
 /**
  * Audio Trimming & Selection

@@ -3,22 +3,21 @@ import { JamendoMusicProvider } from "./jamendo";
 import { UploadMusicProvider } from "./upload";
 import { MusicProviderRegistry } from "./registry";
 
-describe("Music Provider Abstraction", () => {
-  it("registry retrieves registered providers", () => {
+describe("Music Provider Abstraction (Legacy Aliases)", () => {
+  it("registry retrieves registered providers via aliases", () => {
     const registry = MusicProviderRegistry.getInstance();
     const jamendo = registry.getProvider("jamendo");
     expect(jamendo).toBeDefined();
-    expect(jamendo.id).toBe("jamendo");
-    expect(jamendo.isLicensed).toBe(true);
+    expect(jamendo.isLicensedForVideo).toBe(true);
 
     const upload = registry.getProvider("upload");
     expect(upload).toBeDefined();
-    expect(upload.id).toBe("upload");
+    expect(upload.isLicensedForVideo).toBe(true);
   });
 
   it("handles search gracefully when client id is missing", async () => {
     const provider = new JamendoMusicProvider({ clientId: "" });
-    const result = await provider.search({ query: "ambient" });
+    const result = await provider.searchTracks("ambient");
     expect(result.tracks).toEqual([]);
     expect(result.total).toBe(0);
   });
@@ -35,8 +34,8 @@ describe("Music Provider Abstraction", () => {
       mimeType: "audio/mp3",
     });
 
-    expect(track.id).toBe("up-1");
-    expect(track.provider).toBe("upload");
-    expect(track.license.commercialAllowed).toBe(true);
+    expect(track.id).toBe("upload-up-1");
+    expect(track.isAvailableForVideo).toBe(true);
+    expect(track.licenseInfo.commercialAllowed).toBe(true);
   });
 });

@@ -249,11 +249,16 @@ export default function CreateWorkspacePage() {
 
                 <div className="space-y-2">
                   <div className="flex items-center justify-between text-xs font-bold text-muted-foreground">
-                    <span>Licensed Tracks</span>
-                    <Badge variant="success" className="text-[9px] px-1.5">CC Cleared</Badge>
+                    <span>Available Tracks</span>
+                    <Badge variant="success" className="text-[9px] px-1.5">Licensed & Uploads</Badge>
                   </div>
-                  {MOCK_TRACKS.map((track) => {
+                  {MOCK_TRACKS.filter((t) =>
+                    !searchMusicQuery ||
+                    t.title.toLowerCase().includes(searchMusicQuery.toLowerCase()) ||
+                    t.artist.toLowerCase().includes(searchMusicQuery.toLowerCase())
+                  ).map((track) => {
                     const isSelected = track.id === activeTrack.id;
+                    const albumArt = track.albumArt || track.coverArtUrl;
                     return (
                       <div
                         key={track.id}
@@ -265,13 +270,24 @@ export default function CreateWorkspacePage() {
                         }`}
                       >
                         <div className="flex items-center gap-2.5 min-w-0">
-                          <img
-                            src={track.coverArtUrl}
-                            alt={track.title}
-                            className="h-10 w-10 rounded-lg object-cover flex-shrink-0"
-                          />
+                          {albumArt ? (
+                            <img
+                              src={albumArt}
+                              alt={track.title}
+                              className="h-10 w-10 rounded-lg object-cover flex-shrink-0"
+                            />
+                          ) : (
+                            <div className="h-10 w-10 rounded-lg bg-secondary flex items-center justify-center text-muted-foreground flex-shrink-0">
+                              <Music2 className="h-5 w-5" />
+                            </div>
+                          )}
                           <div className="min-w-0">
-                            <h4 className="text-xs font-bold text-foreground truncate">{track.title}</h4>
+                            <div className="flex items-center gap-1">
+                              <h4 className="text-xs font-bold text-foreground truncate">{track.title}</h4>
+                              <span className="text-[9px] px-1 py-0.2 rounded bg-secondary text-muted-foreground uppercase font-bold">
+                                {track.provider}
+                              </span>
+                            </div>
                             <p className="text-[10px] text-muted-foreground truncate">{track.artist}</p>
                           </div>
                         </div>
@@ -287,6 +303,7 @@ export default function CreateWorkspacePage() {
                     );
                   })}
                 </div>
+
               </div>
             )}
 
