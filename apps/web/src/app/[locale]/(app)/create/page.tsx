@@ -9,10 +9,8 @@ import {
   Video,
   Play,
   Pause,
-  RefreshCw,
   Settings,
   Search,
-  Download,
   Film,
 } from "lucide-react";
 
@@ -22,13 +20,6 @@ import {
   Badge,
   Slider,
   Select,
-  Dialog,
-  DialogContent,
-  DialogHeader,
-  DialogTitle,
-  DialogDescription,
-  DialogFooter,
-  Progress,
 } from "@musicmotion/ui";
 import { useProjectStore } from "@/stores/projectStore";
 import { formatTime, type VisualStyle, type AspectRatio } from "@musicmotion/shared";
@@ -37,13 +28,10 @@ import { useRouter } from "@/i18n/routing";
 import { AudioTimelineEditor } from "@/components/AudioTimelineEditor";
 import { CaptionEditor } from "@/components/CaptionEditor";
 import { ScenePlanner } from "@/components/ScenePlanner";
+import { RenderProgressModal } from "@/components/RenderProgressModal";
 
 export default function CreateWorkspacePage() {
-
-
-
   const t = useTranslations("create");
-  const editorT = useTranslations("editor");
   const router = useRouter();
 
   const {
@@ -76,9 +64,6 @@ export default function CreateWorkspacePage() {
 
   // Export Modal State
   const [isExportModalOpen, setIsExportModalOpen] = React.useState(false);
-  const [isRendering, setIsRendering] = React.useState(false);
-  const [renderProgress, setRenderProgress] = React.useState(0);
-  const [renderFinished, setRenderFinished] = React.useState(false);
 
   // Playhead simulation timer
   React.useEffect(() => {
@@ -96,23 +81,6 @@ export default function CreateWorkspacePage() {
     return () => clearInterval(interval);
   }, [isPlaying, selectedDuration, isLooping, setCurrentTime]);
 
-  const handleStartRender = () => {
-    setIsRendering(true);
-    setRenderProgress(5);
-    setRenderFinished(false);
-
-    const timer = setInterval(() => {
-      setRenderProgress((prev) => {
-        if (prev >= 100) {
-          clearInterval(timer);
-          setIsRendering(false);
-          setRenderFinished(true);
-          return 100;
-        }
-        return prev + 15;
-      });
-    }, 400);
-  };
 
 
   const visualStylesList: VisualStyle[] = [
@@ -485,79 +453,39 @@ export default function CreateWorkspacePage() {
 
 
       {/* 4. Export & Rendering Dialog Modal */}
-      <Dialog open={isExportModalOpen} onOpenChange={setIsExportModalOpen}>
-        <DialogContent className="max-w-md" onClose={() => setIsExportModalOpen(false)}>
-          <DialogHeader>
-            <DialogTitle>{editorT("exportTitle")}</DialogTitle>
-            <DialogDescription>{editorT("exportDesc")}</DialogDescription>
-          </DialogHeader>
-
-          <div className="space-y-4 py-2">
-            <div className="p-4 rounded-2xl bg-secondary/40 border border-white/5 space-y-2 text-xs">
-              <div className="flex justify-between">
-                <span className="text-muted-foreground">Composition Format:</span>
-                <span className="font-bold text-foreground">9:16 Vertical Reel</span>
-              </div>
-              <div className="flex justify-between">
-                <span className="text-muted-foreground">Duration:</span>
-                <span className="font-bold text-foreground">{selectedDuration.toFixed(1)} seconds</span>
-              </div>
-              <div className="flex justify-between">
-                <span className="text-muted-foreground">Output Engine:</span>
-                <span className="font-bold text-rose-400">Remotion 4.x Headless</span>
-              </div>
-            </div>
-
-            {isRendering && (
-              <div className="space-y-2 pt-2">
-                <div className="flex justify-between text-xs font-semibold">
-                  <span>Rendering video frames...</span>
-                  <span>{renderProgress}%</span>
-                </div>
-                <Progress value={renderProgress} />
-              </div>
-            )}
-
-            {renderFinished && (
-              <div className="p-3 rounded-xl bg-emerald-500/10 border border-emerald-500/20 text-emerald-400 text-xs font-semibold text-center">
-                ✓ Render finished! Your video is ready to download.
-              </div>
-            )}
-          </div>
-
-          <DialogFooter>
-            {!renderFinished ? (
-              <Button
-                variant="gradient"
-                onClick={handleStartRender}
-                disabled={isRendering}
-                className="w-full rounded-xl font-bold"
-              >
-                {isRendering ? (
-                  <>
-                    <RefreshCw className="h-4 w-4 mr-2 animate-spin" />
-                    Rendering {renderProgress}%
-                  </>
-                ) : (
-                  <>
-                    <Video className="h-4 w-4 mr-2" />
-                    {editorT("startExport")}
-                  </>
-                )}
-              </Button>
-            ) : (
-              <Button
-                variant="gradient"
-                onClick={() => setIsExportModalOpen(false)}
-                className="w-full rounded-xl font-bold"
-              >
-                <Download className="h-4 w-4 mr-2" />
-                {editorT("downloadReady")}
-              </Button>
-            )}
-          </DialogFooter>
-        </DialogContent>
-      </Dialog>
+      {isExportModalOpen && (
+        <RenderProgressModal
+          isOpen={isExportModalOpen}
+          onClose={() => setIsExportModalOpen(false)}
+          project={
+            currentProject || {
+              id: "create-draft",
+              title: activeTrack.title,
+              status: "ready",
+              locale: "en",
+              trackSelection: {
+                id: "selection-1",
+                projectId: "create-draft",
+                trackId: activeTrack.id,
+                startTime,
+                endTime,
+              },
+              captions,
+              scenes,
+              videoConfig: {
+                width: videoConfig.width || 1080,
+                height: videoConfig.height || 1920,
+                fps: videoConfig.fps || 30,
+                aspectRatio: "9:16",
+                duration: selectedDuration,
+              },
+              createdAt: new Date().toISOString(),
+              updatedAt: new Date().toISOString(),
+            }
+          }
+        />
+      )}
     </div>
   );
 }
+

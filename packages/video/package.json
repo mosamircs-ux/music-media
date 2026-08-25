@@ -8,8 +8,12 @@
     ".": "./src/index.ts",
     "./compositions": "./src/compositions/index.ts",
     "./render": "./src/render/index.ts",
-    "./generation": "./src/generation/index.ts"
+    "./generation": "./src/generation/index.ts",
+    "./transitions": "./src/transitions/index.ts",
+    "./captions": "./src/captions/index.ts",
+    "./ffmpeg": "./src/ffmpeg/index.ts"
   },
+
   "scripts": {
     "typecheck": "tsc --noEmit",
     "lint": "eslint \"src/**/*.{ts,tsx}\"",

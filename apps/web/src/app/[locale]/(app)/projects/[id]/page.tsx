@@ -18,13 +18,6 @@ import {
   Button,
   Input,
   Badge,
-  Dialog,
-  DialogContent,
-  DialogHeader,
-  DialogTitle,
-  DialogDescription,
-  DialogFooter,
-  Progress,
 } from "@musicmotion/ui";
 import { useProjectStore } from "@/stores/projectStore";
 import {
@@ -38,8 +31,10 @@ import { useRouter } from "@/i18n/routing";
 import { AudioTimelineEditor } from "@/components/AudioTimelineEditor";
 import { CaptionEditor } from "@/components/CaptionEditor";
 import { ScenePlanner } from "@/components/ScenePlanner";
+import { RenderProgressModal } from "@/components/RenderProgressModal";
 
 export default function ProjectEditorPage() {
+
 
   const t = useTranslations("editor");
   const router = useRouter();
@@ -63,9 +58,6 @@ export default function ProjectEditorPage() {
 
   // Export Modal
   const [isExportOpen, setIsExportOpen] = React.useState(false);
-  const [isRendering, setIsRendering] = React.useState(false);
-  const [renderProgress, setRenderProgress] = React.useState(0);
-  const [renderDone, setRenderDone] = React.useState(false);
 
   const activeTrack = selectedTrack || MOCK_TRACKS[0];
   const startTime = trackSelection?.startTime || 0;
@@ -88,23 +80,6 @@ export default function ProjectEditorPage() {
     return () => clearInterval(interval);
   }, [isPlaying, duration, setCurrentTime]);
 
-
-  const handleStartRender = () => {
-    setIsRendering(true);
-    setRenderProgress(10);
-    setRenderDone(false);
-    const timer = setInterval(() => {
-      setRenderProgress((prev) => {
-        if (prev >= 100) {
-          clearInterval(timer);
-          setIsRendering(false);
-          setRenderDone(true);
-          return 100;
-        }
-        return prev + 20;
-      });
-    }, 400);
-  };
 
   const transitionsList: { value: TransitionType; label: string }[] = [
 
@@ -363,64 +338,39 @@ export default function ProjectEditorPage() {
 
 
       {/* Export Modal */}
-      <Dialog open={isExportOpen} onOpenChange={setIsExportOpen}>
-        <DialogContent className="max-w-md" onClose={() => setIsExportOpen(false)}>
-          <DialogHeader>
-            <DialogTitle>Export High-Resolution Video</DialogTitle>
-            <DialogDescription>Render full HD 1080p MP4 ready for TikTok and Instagram Reels.</DialogDescription>
-          </DialogHeader>
-
-          <div className="space-y-4 py-2 text-xs">
-            <div className="p-4 rounded-2xl bg-secondary/40 border border-white/5 space-y-2">
-              <div className="flex justify-between">
-                <span className="text-muted-foreground">Format:</span>
-                <span className="font-bold">9:16 Vertical (1080x1920)</span>
-              </div>
-              <div className="flex justify-between">
-                <span className="text-muted-foreground">Duration:</span>
-                <span className="font-bold">{duration.toFixed(1)}s</span>
-              </div>
-            </div>
-
-            {isRendering && (
-              <div className="space-y-2">
-                <div className="flex justify-between font-semibold">
-                  <span>Rendering with Remotion...</span>
-                  <span>{renderProgress}%</span>
-                </div>
-                <Progress value={renderProgress} />
-              </div>
-            )}
-
-            {renderDone && (
-              <div className="p-3 rounded-xl bg-emerald-500/10 border border-emerald-500/20 text-emerald-400 font-semibold text-center">
-                ✓ Render complete! Ready to download.
-              </div>
-            )}
-          </div>
-
-          <DialogFooter>
-            {!renderDone ? (
-              <Button
-                variant="gradient"
-                onClick={handleStartRender}
-                disabled={isRendering}
-                className="w-full rounded-xl font-bold"
-              >
-                {isRendering ? `Rendering ${renderProgress}%` : "Start Render"}
-              </Button>
-            ) : (
-              <Button
-                variant="gradient"
-                onClick={() => setIsExportOpen(false)}
-                className="w-full rounded-xl font-bold"
-              >
-                <Download className="h-4 w-4 mr-2" /> Download MP4
-              </Button>
-            )}
-          </DialogFooter>
-        </DialogContent>
-      </Dialog>
+      {isExportOpen && (
+        <RenderProgressModal
+          isOpen={isExportOpen}
+          onClose={() => setIsExportOpen(false)}
+          project={
+            currentProject || {
+              id: "project-editor",
+              title: activeTrack.title,
+              status: "ready",
+              locale: "en",
+              trackSelection: {
+                id: "selection-editor",
+                projectId: "project-editor",
+                trackId: activeTrack.id,
+                startTime,
+                endTime,
+              },
+              captions,
+              scenes,
+              videoConfig: {
+                width: 1080,
+                height: 1920,
+                fps: 30,
+                aspectRatio: "9:16",
+                duration,
+              },
+              createdAt: new Date().toISOString(),
+              updatedAt: new Date().toISOString(),
+            }
+          }
+        />
+      )}
     </div>
   );
 }
+

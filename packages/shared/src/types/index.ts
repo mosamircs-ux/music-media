@@ -476,18 +476,56 @@ export interface Project {
   outputVideoUrl?: string;
 }
 
-export type RenderJobStatus = "queued" | "processing" | "rendering" | "encoding" | "completed" | "failed";
+export type RenderJobStatus = "queued" | "processing" | "rendering" | "encoding" | "completed" | "failed" | "cancelled";
+
+export type RenderStage =
+  | "preparing"
+  | "generating"
+  | "composing"
+  | "rendering"
+  | "encoding"
+  | "uploading"
+  | "completed";
+
+export interface RenderStageInfo {
+  stage: RenderStage;
+  label: string;
+  status: "pending" | "active" | "completed" | "failed";
+  progress?: number;
+  message?: string;
+}
 
 export interface RenderJob {
   id: string;
   projectId: string;
   status: RenderJobStatus;
+  stage: RenderStage;
   progress: number; // 0 - 100
+  stages?: RenderStageInfo[];
   outputUrl?: string;
+  durationSeconds?: number;
+  fileSizeBytes?: number;
   error?: string;
+  startedAt?: string;
+  completedAt?: string;
   createdAt: string;
   updatedAt: string;
 }
+
+export interface RenderProgressInfo {
+  jobId: string;
+  projectId: string;
+  status: RenderJobStatus;
+  stage: RenderStage;
+  progress: number;
+  stages: RenderStageInfo[];
+  outputUrl?: string;
+  error?: string;
+  durationSeconds?: number;
+  fileSizeBytes?: number;
+  updatedAt: string;
+}
+
 
 /**
  * Video Templates

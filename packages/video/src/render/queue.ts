@@ -9,6 +9,7 @@ function getRedisConnection(): Redis {
   return new Redis(redisUrl, {
     maxRetriesPerRequest: null,
     enableReadyCheck: false,
+    lazyConnect: true,
   });
 }
 

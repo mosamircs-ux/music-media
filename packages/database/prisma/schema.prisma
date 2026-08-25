@@ -155,21 +155,26 @@ model Scene {
 }
 
 model RenderJob {
-  id          String          @id @default(uuid())
-  projectId   String
-  project     Project         @relation(fields: [projectId], references: [id], onDelete: Cascade)
-  status      RenderJobStatus @default(QUEUED)
-  progress    Int             @default(0)
-  outputUrl   String?
-  error       String?
-  startedAt   DateTime?
-  completedAt DateTime?
-  createdAt   DateTime        @default(now())
-  updatedAt   DateTime        @updatedAt
+  id              String          @id @default(uuid())
+  projectId       String
+  project         Project         @relation(fields: [projectId], references: [id], onDelete: Cascade)
+  status          RenderJobStatus @default(QUEUED)
+  stage           String          @default("preparing")
+  progress        Int             @default(0)
+  outputUrl       String?
+  durationSeconds Float?
+  fileSizeBytes   BigInt?
+  error           String?
+  startedAt       DateTime?
+  completedAt     DateTime?
+  createdAt       DateTime        @default(now())
+  updatedAt       DateTime        @updatedAt
 
   @@index([projectId])
   @@index([status])
+  @@index([projectId, status])
 }
+
 
 model GeneratedAsset {
   id             String      @id @default(uuid())
