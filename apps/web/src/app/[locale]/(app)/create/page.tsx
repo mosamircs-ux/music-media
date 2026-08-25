@@ -569,10 +569,30 @@ export default function CreateWorkspacePage() {
         </div>
 
         {/* Multi-Track Canvas */}
-        <div className="flex-1 space-y-1.5 py-1.5 relative overflow-x-auto">
+        <div
+          className="flex-1 space-y-1.5 py-1.5 relative overflow-x-auto cursor-pointer"
+          onClick={(e) => {
+            const rect = e.currentTarget.getBoundingClientRect();
+            const clickX = e.clientX - rect.left;
+            const progressRatio = Math.max(0, Math.min(1, clickX / rect.width));
+            setCurrentTime(progressRatio * selectedDuration);
+          }}
+        >
+          {/* Playhead Needle Scrubber Line */}
+          <div
+            className="absolute top-0 bottom-0 w-0.5 bg-rose-500 z-20 pointer-events-none transition-all"
+            style={{
+              left: `${Math.min(100, Math.max(0, (currentTime / selectedDuration) * 100))}%`,
+            }}
+          >
+            <div className="w-3 h-3 bg-rose-500 rotate-45 -translate-x-[5px] -translate-y-1 rounded-sm shadow-md shadow-rose-500/50" />
+          </div>
+
           {/* TRACK 1: Waveform Trimmer Track */}
           <div className="h-10 w-full rounded-lg bg-secondary/40 border border-white/5 relative flex items-center px-2">
-            <span className="absolute left-2 top-0.5 text-[9px] uppercase font-bold text-muted-foreground">Audio Track</span>
+            <span className="absolute left-2 top-0.5 text-[9px] uppercase font-bold text-muted-foreground z-10">
+              Audio Waveform (Start: {formatTime(startTime)} • End: {formatTime(endTime)})
+            </span>
             {/* Draggable Selection Handle Overlay */}
             <div
               className="absolute inset-y-0 bg-rose-500/25 border-x-2 border-rose-500 flex items-center justify-between px-1"
@@ -581,8 +601,8 @@ export default function CreateWorkspacePage() {
                 width: `${(selectedDuration / activeTrack.duration) * 100}%`,
               }}
             >
-              <div className="w-1.5 h-6 bg-rose-400 rounded-full cursor-ew-resize" />
-              <div className="w-1.5 h-6 bg-rose-400 rounded-full cursor-ew-resize" />
+              <div className="w-1.5 h-6 bg-rose-400 rounded-full cursor-ew-resize shadow-sm" title="Start Marker" />
+              <div className="w-1.5 h-6 bg-rose-400 rounded-full cursor-ew-resize shadow-sm" title="End Marker" />
             </div>
             {/* Waveform Bars */}
             <div className="w-full flex items-center justify-between gap-0.5 opacity-60">
@@ -602,7 +622,7 @@ export default function CreateWorkspacePage() {
             {captions.map((cap, i) => (
               <div
                 key={cap.id}
-                className="absolute inset-y-1 bg-indigo-500/40 border border-indigo-400 rounded px-2 flex items-center text-[9px] font-bold text-indigo-200 truncate cursor-pointer"
+                className="absolute inset-y-1 bg-indigo-500/40 border border-indigo-400 rounded px-2 flex items-center text-[9px] font-bold text-indigo-200 truncate cursor-pointer hover:bg-indigo-500/60"
                 style={{
                   left: `${(i * 30) + 10}%`,
                   width: "25%",
@@ -619,7 +639,7 @@ export default function CreateWorkspacePage() {
             {scenes.map((scene, i) => (
               <div
                 key={scene.id}
-                className="absolute inset-y-1 bg-purple-500/40 border border-purple-400 rounded px-2 flex items-center text-[9px] font-bold text-purple-200 truncate"
+                className="absolute inset-y-1 bg-purple-500/40 border border-purple-400 rounded px-2 flex items-center text-[9px] font-bold text-purple-200 truncate hover:bg-purple-500/60"
                 style={{
                   left: `${(i * 25) + 5}%`,
                   width: "22%",
@@ -631,6 +651,7 @@ export default function CreateWorkspacePage() {
           </div>
         </div>
       </div>
+
 
       {/* 4. Export & Rendering Dialog Modal */}
       <Dialog open={isExportModalOpen} onOpenChange={setIsExportModalOpen}>

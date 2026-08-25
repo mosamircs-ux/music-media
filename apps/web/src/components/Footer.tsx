@@ -1,11 +1,22 @@
 "use client";
 
 import { useTranslations } from "next-intl";
-import { Link } from "@/i18n/routing";
+import { Link, usePathname } from "@/i18n/routing";
 import { Music2, ShieldCheck, Heart } from "lucide-react";
 
 export function Footer() {
   const appT = useTranslations("app");
+  const pathname = usePathname();
+
+  // Hide footer on full-viewport studio workspaces
+  const isWorkspace =
+    pathname.startsWith("/create") ||
+    pathname.startsWith("/editor") ||
+    (pathname.startsWith("/projects/") && pathname !== "/projects");
+
+  if (isWorkspace) {
+    return null;
+  }
 
   return (
     <footer className="border-t border-border/40 bg-card/30 backdrop-blur-xl mt-auto">

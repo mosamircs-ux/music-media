@@ -415,6 +415,96 @@ export const MOCK_USER: UserProfile = {
   createdAt: "2026-01-15T00:00:00Z",
 };
 
+export const MOCK_ARTISTS = [
+  {
+    id: "art-1",
+    name: "Alex Stoner",
+    genre: "Synthwave / Cyber",
+    monthlyListeners: "245K",
+    avatarUrl: "https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=300&q=80",
+    tracksCount: 18,
+  },
+  {
+    id: "art-2",
+    name: "Luna Beats",
+    genre: "Lo-Fi & Chillhop",
+    monthlyListeners: "480K",
+    avatarUrl: "https://images.unsplash.com/photo-1517841905240-472988babdf9?auto=format&fit=crop&w=300&q=80",
+    tracksCount: 32,
+  },
+  {
+    id: "art-3",
+    name: "Nordic Symphony",
+    genre: "Cinematic & Trailer",
+    monthlyListeners: "190K",
+    avatarUrl: "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?auto=format&fit=crop&w=300&q=80",
+    tracksCount: 14,
+  },
+  {
+    id: "art-4",
+    name: "KAIZO",
+    genre: "Trap & Hip Hop",
+    monthlyListeners: "360K",
+    avatarUrl: "https://images.unsplash.com/photo-1500648767791-00dcc994a43e?auto=format&fit=crop&w=300&q=80",
+    tracksCount: 22,
+  },
+  {
+    id: "art-5",
+    name: "Aetheria",
+    genre: "Ambient & Space",
+    monthlyListeners: "125K",
+    avatarUrl: "https://images.unsplash.com/photo-1494790108377-be9c29b29330?auto=format&fit=crop&w=300&q=80",
+    tracksCount: 16,
+  },
+  {
+    id: "art-6",
+    name: "Vortex DJ",
+    genre: "EDM & Festival",
+    monthlyListeners: "510K",
+    avatarUrl: "https://images.unsplash.com/photo-1522075469751-3a6694fb2f61?auto=format&fit=crop&w=300&q=80",
+    tracksCount: 28,
+  },
+];
+
+export const MOCK_ALBUMS = [
+  {
+    id: "alb-1",
+    title: "Neon Echoes (Deluxe)",
+    artist: "Alex Stoner",
+    tracksCount: 10,
+    coverArtUrl: "https://images.unsplash.com/photo-1518709268805-4e9042af9f23?auto=format&fit=crop&w=400&q=80",
+    releaseYear: 2026,
+    genre: "Synthwave",
+  },
+  {
+    id: "alb-2",
+    title: "Study Session Vol. 3",
+    artist: "Luna Beats",
+    tracksCount: 14,
+    coverArtUrl: "https://images.unsplash.com/photo-1511671782779-c97d3d27a1d4?auto=format&fit=crop&w=400&q=80",
+    releaseYear: 2025,
+    genre: "Lo-Fi",
+  },
+  {
+    id: "alb-3",
+    title: "Cinematic Realms Soundtrack",
+    artist: "Nordic Symphony",
+    tracksCount: 8,
+    coverArtUrl: "https://images.unsplash.com/photo-1508700115892-45ecd05ae2ad?auto=format&fit=crop&w=400&q=80",
+    releaseYear: 2026,
+    genre: "Cinematic",
+  },
+  {
+    id: "alb-4",
+    title: "Shibuya Underground",
+    artist: "KAIZO",
+    tracksCount: 12,
+    coverArtUrl: "https://images.unsplash.com/photo-1514525253161-7a46d19cd819?auto=format&fit=crop&w=400&q=80",
+    releaseYear: 2026,
+    genre: "Hip Hop",
+  },
+];
+
 export const MOCK_TESTIMONIALS = [
   {
     quote: "MusicMotion cut my Reels creation time from 4 hours in Premiere to 3 minutes. The AI visual scenes match the music drops perfectly.",
@@ -438,3 +528,5 @@ export const MOCK_TESTIMONIALS = [
     avatar: "https://images.unsplash.com/photo-1500648767791-00dcc994a43e?auto=format&fit=crop&w=200&q=80",
   },
 ];
+
+

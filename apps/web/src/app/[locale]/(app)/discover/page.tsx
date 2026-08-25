@@ -2,6 +2,7 @@
 
 import * as React from "react";
 import { useTranslations } from "next-intl";
+
 import {
   Search,
   Music,
@@ -13,10 +14,12 @@ import {
   Flame,
   Disc3,
   Tag,
+  Users,
+  Layers,
 } from "lucide-react";
 import { Button, Card, CardContent, Input, Badge, Slider } from "@musicmotion/ui";
 import type { Track } from "@musicmotion/shared";
-import { MOCK_TRACKS, MOCK_GENRES } from "@/lib/mockData";
+import { MOCK_TRACKS, MOCK_GENRES, MOCK_ARTISTS, MOCK_ALBUMS } from "@/lib/mockData";
 import { useProjectStore } from "@/stores/projectStore";
 import { useRouter } from "@/i18n/routing";
 
@@ -153,7 +156,77 @@ export default function DiscoverPage() {
         </div>
       </section>
 
-      {/* 4. Trending & Track Catalog */}
+      {/* 4. Featured Artists Section */}
+      <section className="space-y-4">
+        <div className="flex items-center justify-between">
+          <h2 className="text-xl font-bold tracking-tight flex items-center gap-2">
+            <Users className="h-5 w-5 text-rose-400" />
+            <span>Featured Artists</span>
+          </h2>
+        </div>
+
+        <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-4">
+          {MOCK_ARTISTS.map((artist) => (
+            <div
+              key={artist.id}
+              onClick={() => setSearchQuery(artist.name)}
+              className="p-4 rounded-2xl bg-card/60 border border-white/10 hover:bg-card/90 transition-all text-center space-y-3 cursor-pointer group shadow-lg"
+            >
+              <div className="relative h-24 w-24 mx-auto rounded-full overflow-hidden border-2 border-rose-500/30 group-hover:border-rose-500 group-hover:scale-105 transition-all shadow-md">
+                <img
+                  src={artist.avatarUrl}
+                  alt={artist.name}
+                  className="h-full w-full object-cover"
+                />
+              </div>
+              <div>
+                <h4 className="text-xs font-bold text-foreground truncate">{artist.name}</h4>
+                <p className="text-[10px] text-muted-foreground truncate">{artist.genre}</p>
+                <span className="text-[9px] font-semibold text-rose-400 mt-1 block">
+                  {artist.monthlyListeners} monthly
+                </span>
+              </div>
+            </div>
+          ))}
+        </div>
+      </section>
+
+      {/* 5. Curated Albums Section */}
+      <section className="space-y-4">
+        <div className="flex items-center justify-between">
+          <h2 className="text-xl font-bold tracking-tight flex items-center gap-2">
+            <Layers className="h-5 w-5 text-indigo-400" />
+            <span>Curated Soundtracks & Albums</span>
+          </h2>
+        </div>
+
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+          {MOCK_ALBUMS.map((album) => (
+            <div
+              key={album.id}
+              onClick={() => setSearchQuery(album.title.split(" ")[0])}
+              className="p-4 rounded-2xl bg-card/60 border border-white/10 hover:bg-card/90 transition-all flex items-center gap-3.5 cursor-pointer group shadow-lg"
+            >
+              <img
+                src={album.coverArtUrl}
+                alt={album.title}
+                className="h-16 w-16 rounded-xl object-cover flex-shrink-0 group-hover:scale-105 transition-transform"
+              />
+              <div className="min-w-0">
+                <h4 className="text-xs font-bold text-foreground truncate">{album.title}</h4>
+                <p className="text-[11px] text-muted-foreground truncate">{album.artist}</p>
+                <div className="flex items-center gap-2 mt-1 text-[10px] text-muted-foreground">
+                  <span>{album.genre}</span>
+                  <span>•</span>
+                  <span>{album.tracksCount} tracks</span>
+                </div>
+              </div>
+            </div>
+          ))}
+        </div>
+      </section>
+
+      {/* 6. Trending & Track Catalog */}
       <section className="space-y-6">
         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
           <div className="flex items-center gap-2">
@@ -288,3 +361,4 @@ export default function DiscoverPage() {
     </div>
   );
 }
+

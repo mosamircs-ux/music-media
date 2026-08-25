@@ -36,7 +36,9 @@ import {
   type TransitionType,
   type CaptionPosition,
   type CaptionAnimation,
+  type CaptionFontWeight,
 } from "@musicmotion/shared";
+
 import { MOCK_TRACKS } from "@/lib/mockData";
 import { useRouter } from "@/i18n/routing";
 
@@ -285,7 +287,7 @@ export default function ProjectEditorPage() {
               {activeCaption && (
                 <div className="p-4 rounded-2xl bg-secondary/30 border border-white/5 space-y-4 text-xs">
                   <div>
-                    <label className="font-semibold text-muted-foreground block mb-1">Caption Text</label>
+                    <label className="font-semibold text-muted-foreground block mb-1">Caption / Lyric Text</label>
                     <Input
                       value={activeCaption.text}
                       onChange={(e) => updateCaption(activeCaption.id, { text: e.target.value })}
@@ -293,6 +295,35 @@ export default function ProjectEditorPage() {
                     />
                   </div>
 
+                  {/* Timing Offsets */}
+                  <div className="grid grid-cols-2 gap-3">
+                    <div>
+                      <label className="font-semibold text-muted-foreground block mb-1">Start Time (s)</label>
+                      <Input
+                        type="number"
+                        step="0.1"
+                        min="0"
+                        max={duration}
+                        value={activeCaption.startTime}
+                        onChange={(e) => updateCaption(activeCaption.id, { startTime: Number(e.target.value) })}
+                        className="h-8 bg-background/80"
+                      />
+                    </div>
+                    <div>
+                      <label className="font-semibold text-muted-foreground block mb-1">End Time (s)</label>
+                      <Input
+                        type="number"
+                        step="0.1"
+                        min={activeCaption.startTime + 0.5}
+                        max={duration}
+                        value={activeCaption.endTime}
+                        onChange={(e) => updateCaption(activeCaption.id, { endTime: Number(e.target.value) })}
+                        className="h-8 bg-background/80"
+                      />
+                    </div>
+                  </div>
+
+                  {/* Typography & Animation */}
                   <div className="grid grid-cols-2 gap-3">
                     <div>
                       <label className="font-semibold text-muted-foreground block mb-1">Font Family</label>
@@ -304,15 +335,16 @@ export default function ProjectEditorPage() {
                           })
                         }
                         options={[
-                          { value: "Inter", label: "Inter (Modern)" },
+                          { value: "Inter", label: "Inter (Modern Sans)" },
                           { value: "Impact", label: "Impact (Bold Pop)" },
                           { value: "Montserrat", label: "Montserrat (Clean)" },
                           { value: "Outfit", label: "Outfit (Dynamic)" },
+                          { value: "Playfair Display", label: "Playfair (Serif)" },
                         ]}
                       />
                     </div>
                     <div>
-                      <label className="font-semibold text-muted-foreground block mb-1">Animation</label>
+                      <label className="font-semibold text-muted-foreground block mb-1">Animation Effect</label>
                       <Select
                         value={activeCaption.style?.animation || "pop"}
                         onChange={(val) =>
@@ -325,12 +357,59 @@ export default function ProjectEditorPage() {
                           { value: "karaoke", label: "Karaoke Highlight" },
                           { value: "typewriter", label: "Typewriter" },
                           { value: "fade", label: "Smooth Fade" },
-                          { value: "bounce", label: "Bounce" },
+                          { value: "bounce", label: "Bounce Jump" },
+                          { value: "none", label: "None (Static)" },
                         ]}
                       />
                     </div>
                   </div>
 
+                  {/* Weight & Alignment */}
+                  <div className="grid grid-cols-2 gap-3">
+                    <div>
+                      <label className="font-semibold text-muted-foreground block mb-1">Font Weight</label>
+                      <Select
+                        value={activeCaption.style?.fontWeight || "bold"}
+                        onChange={(val) =>
+                          updateCaption(activeCaption.id, {
+                            style: { ...activeCaption.style, fontWeight: val as CaptionFontWeight },
+                          })
+                        }
+                        options={[
+                          { value: "normal", label: "Normal (400)" },
+                          { value: "medium", label: "Medium (500)" },
+                          { value: "semibold", label: "Semibold (600)" },
+                          { value: "bold", label: "Bold (700)" },
+                          { value: "extrabold", label: "Extrabold (800)" },
+                        ]}
+                      />
+                    </div>
+                    <div>
+                      <label className="font-semibold text-muted-foreground block mb-1">Text Alignment</label>
+                      <div className="grid grid-cols-3 gap-1 pt-0.5">
+                        {(["left", "center", "right"] as const).map((align) => (
+                          <button
+                            key={align}
+                            type="button"
+                            onClick={() =>
+                              updateCaption(activeCaption.id, {
+                                style: { ...activeCaption.style, alignment: align },
+                              })
+                            }
+                            className={`py-1.5 rounded-lg text-xs capitalize font-bold border transition-all ${
+                              (activeCaption.style?.alignment || "center") === align
+                                ? "border-rose-500 bg-rose-500/20 text-rose-300"
+                                : "border-white/5 bg-secondary/40 text-muted-foreground"
+                            }`}
+                          >
+                            {align}
+                          </button>
+                        ))}
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* Position & Size */}
                   <div className="grid grid-cols-2 gap-3">
                     <div>
                       <label className="font-semibold text-muted-foreground block mb-1">Vertical Position</label>
@@ -349,7 +428,7 @@ export default function ProjectEditorPage() {
                       />
                     </div>
                     <div>
-                      <label className="font-semibold text-muted-foreground block mb-1">Font Size (px)</label>
+                      <label className="font-semibold text-muted-foreground block mb-1">Font Size ({activeCaption.style?.fontSize || 44}px)</label>
                       <Slider
                         value={activeCaption.style?.fontSize || 44}
                         min={20}
@@ -362,6 +441,50 @@ export default function ProjectEditorPage() {
                         }
                         showValue
                       />
+                    </div>
+                  </div>
+
+                  {/* Color & Background Presets */}
+                  <div className="grid grid-cols-2 gap-3 pt-1">
+                    <div>
+                      <label className="font-semibold text-muted-foreground block mb-1.5">Text Color</label>
+                      <div className="flex items-center gap-1.5">
+                        {["#ffffff", "#f43f5e", "#a855f7", "#38bdf8", "#facc15"].map((col) => (
+                          <button
+                            key={col}
+                            type="button"
+                            onClick={() =>
+                              updateCaption(activeCaption.id, {
+                                style: { ...activeCaption.style, textColor: col },
+                              })
+                            }
+                            className="h-6 w-6 rounded-full border border-white/20 transition-transform hover:scale-110"
+                            style={{ backgroundColor: col }}
+                          />
+                        ))}
+                      </div>
+                    </div>
+                    <div>
+                      <label className="font-semibold text-muted-foreground block mb-1.5">Background Style</label>
+                      <div className="flex items-center gap-1.5">
+                        {[
+                          { val: "rgba(0,0,0,0.75)", bg: "bg-black/75" },
+                          { val: "rgba(244,63,94,0.3)", bg: "bg-rose-500/30" },
+                          { val: "rgba(168,85,247,0.3)", bg: "bg-purple-500/30" },
+                          { val: "transparent", bg: "bg-transparent border border-white/30" },
+                        ].map((b, idx) => (
+                          <button
+                            key={idx}
+                            type="button"
+                            onClick={() =>
+                              updateCaption(activeCaption.id, {
+                                style: { ...activeCaption.style, backgroundColor: b.val },
+                              })
+                            }
+                            className={`h-6 w-6 rounded-lg ${b.bg} transition-transform hover:scale-110`}
+                          />
+                        ))}
+                      </div>
                     </div>
                   </div>
 
@@ -386,7 +509,7 @@ export default function ProjectEditorPage() {
               <h3 className="text-sm font-bold text-foreground">AI Visual Style & Prompts</h3>
               <div className="p-4 rounded-2xl bg-secondary/30 border border-white/5 space-y-4 text-xs">
                 <div>
-                  <label className="font-semibold text-muted-foreground block mb-1">Select Preset Style</label>
+                  <label className="font-semibold text-muted-foreground block mb-1">Select Preset Style (9 Styles)</label>
                   <div className="grid grid-cols-3 gap-2">
                     {visualStylesList.map((st) => (
                       <button
@@ -439,6 +562,7 @@ export default function ProjectEditorPage() {
               </div>
             </div>
           )}
+
 
           {/* SECTION 4: SCENES */}
           {activeSection === "scenes" && (
