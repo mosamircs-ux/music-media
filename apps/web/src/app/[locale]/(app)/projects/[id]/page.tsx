@@ -41,8 +41,10 @@ import {
 
 import { MOCK_TRACKS } from "@/lib/mockData";
 import { useRouter } from "@/i18n/routing";
+import { AudioTimelineEditor } from "@/components/AudioTimelineEditor";
 
 export default function ProjectEditorPage() {
+
   const t = useTranslations("editor");
   const router = useRouter();
 
@@ -693,37 +695,23 @@ export default function ProjectEditorPage() {
       </div>
 
       {/* Bottom Multi-Track Timeline */}
-      <div className="h-32 border-t border-border/40 bg-card/80 backdrop-blur-xl p-3 flex flex-col justify-between flex-shrink-0">
-        <div className="flex items-center justify-between pb-1.5 border-b border-white/5 text-xs">
-          <div className="flex items-center gap-3">
-            <span className="font-mono font-bold text-foreground">
-              {formatTime(currentTime)} / {formatTime(duration)}
-            </span>
-            <Badge variant="secondary" className="text-[10px]">9:16 Vertical Video</Badge>
-          </div>
-        </div>
-
-        <div className="flex-1 space-y-1.5 py-1 relative">
-          <div className="h-8 w-full rounded-lg bg-secondary/40 border border-white/5 relative flex items-center px-2">
-            <div
-              className="absolute inset-y-0 bg-rose-500/25 border-x-2 border-rose-500 flex items-center justify-between px-1"
-              style={{
-                left: `${(startTime / activeTrack.duration) * 100}%`,
-                width: `${(duration / activeTrack.duration) * 100}%`,
-              }}
-            />
-            <div className="w-full flex items-center justify-between gap-0.5 opacity-60">
-              {Array.from({ length: 64 }).map((_, i) => (
-                <div
-                  key={i}
-                  className="w-1 bg-muted-foreground/40 rounded-full"
-                  style={{ height: `${20 + Math.sin(i * 0.4) * 35 + Math.random() * 20}%` }}
-                />
-              ))}
-            </div>
-          </div>
-        </div>
+      <div className="p-3 border-t border-border/40 bg-card/80 backdrop-blur-xl flex-shrink-0">
+        <AudioTimelineEditor
+          track={activeTrack}
+          startTime={startTime}
+          endTime={endTime}
+          currentTime={currentTime}
+          isPlaying={isPlaying}
+          minDuration={3}
+          maxDuration={60}
+          captions={captions}
+          scenes={scenes}
+          onSelectionChange={(newStart, newEnd) => updateSelection(newStart, newEnd)}
+          onTimeUpdate={(newTime) => setCurrentTime(newTime)}
+          onPlayPause={(play) => setIsPlaying(play)}
+        />
       </div>
+
 
       {/* Export Modal */}
       <Dialog open={isExportOpen} onOpenChange={setIsExportOpen}>

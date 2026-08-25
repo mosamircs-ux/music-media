@@ -1,7 +1,142 @@
 /**
+ * Format seconds into mm:ss.SSS (e.g. 00:42.500)
+ */
+export function formatPreciseTime(seconds: number): string {
+  if (isNaN(seconds) || seconds < 0) return "00:00.000";
+  const totalMs = Math.round(seconds * 1000);
+  const mins = Math.floor(totalMs / 60000);
+  const secs = Math.floor((totalMs % 60000) / 1000);
+  const ms = totalMs % 1000;
+
+  const formattedMins = String(mins).padStart(2, "0");
+  const formattedSecs = String(secs).padStart(2, "0");
+  const formattedMs = String(ms).padStart(3, "0");
+
+  return `${formattedMins}:${formattedSecs}.${formattedMs}`;
+}
+
+
+/**
+ * Parses a time string (e.g. "00:42.500", "01:08", "45.2", "90") into seconds
+ */
+export function parsePreciseTime(timeStr: string): number | null {
+  if (!timeStr || typeof timeStr !== "string") return null;
+  const trimmed = timeStr.trim();
+
+  // Pattern 1: mm:ss.SSS or mm:ss
+  if (trimmed.includes(":")) {
+    const parts = trimmed.split(":");
+    if (parts.length === 2) {
+      const mins = Number(parts[0]);
+      const secs = Number(parts[1]);
+      if (!isNaN(mins) && !isNaN(secs) && mins >= 0 && secs >= 0 && secs < 60) {
+        return mins * 60 + secs;
+      }
+    } else if (parts.length === 3) {
+      const hours = Number(parts[0]);
+      const mins = Number(parts[1]);
+      const secs = Number(parts[2]);
+      if (!isNaN(hours) && !isNaN(mins) && !isNaN(secs) && hours >= 0 && mins >= 0 && mins < 60 && secs >= 0 && secs < 60) {
+        return hours * 3600 + mins * 60 + secs;
+      }
+    }
+    return null;
+  }
+
+  // Pattern 2: Raw seconds (e.g. "42.5")
+  const rawNum = Number(trimmed);
+  if (!isNaN(rawNum) && rawNum >= 0) {
+    return rawNum;
+  }
+
+  return null;
+}
+
+export type SnappingMode = "free" | "beat" | "second";
+
+/**
+ * Snaps time to specific intervals based on mode
+ */
+export function snapTime(time: number, mode: SnappingMode, bpm = 120): number {
+  if (isNaN(time) || time < 0) return 0;
+
+  switch (mode) {
+    case "second": {
+      return Math.round(time);
+    }
+    case "beat": {
+      const validBpm = bpm > 0 ? bpm : 120;
+      const beatDuration = 60 / validBpm; // duration of 1 quarter note in seconds
+      return Math.round(time / beatDuration) * beatDuration;
+    }
+    case "free":
+    default: {
+      return Math.round(time * 1000) / 1000;
+    }
+  }
+}
+
+export interface TimeRangeValidationResult {
+  isValid: boolean;
+  error?: string;
+  start: number;
+  end: number;
+  duration: number;
+}
+
+/**
+ * Validates and clamps a timeline selection range
+ */
+export function validateTimeRange(
+  rawStart: number,
+  rawEnd: number,
+  totalDuration: number,
+  minDuration = 1,
+  maxDuration = 60
+): TimeRangeValidationResult {
+  const safeTotal = Math.max(1, totalDuration || 1);
+  let start = clamp(rawStart, 0, safeTotal);
+  let end = clamp(rawEnd, 0, safeTotal);
+
+  if (start >= end) {
+    end = Math.min(safeTotal, start + minDuration);
+    if (end - start < minDuration && start > 0) {
+      start = Math.max(0, end - minDuration);
+    }
+  }
+
+  let duration = end - start;
+
+  if (duration < minDuration) {
+    end = Math.min(safeTotal, start + minDuration);
+    duration = end - start;
+  }
+
+  if (duration > maxDuration) {
+    end = start + maxDuration;
+    if (end > safeTotal) {
+      end = safeTotal;
+      start = Math.max(0, end - maxDuration);
+    }
+    duration = end - start;
+  }
+
+  const isValid = start >= 0 && end <= safeTotal && start < end && duration >= minDuration;
+
+  return {
+    isValid,
+    error: isValid ? undefined : "Invalid selection time range",
+    start: Math.round(start * 1000) / 1000,
+    end: Math.round(end * 1000) / 1000,
+    duration: Math.round(duration * 1000) / 1000,
+  };
+}
+
+/**
  * Format seconds into mm:ss or mm:ss.ms
  */
 export function formatTime(seconds: number, includeMs = false): string {
+
   if (isNaN(seconds) || seconds < 0) return includeMs ? "00:00.0" : "00:00";
   const mins = Math.floor(seconds / 60);
   const secs = Math.floor(seconds % 60);
@@ -50,3 +185,5 @@ export function secondsToFrames(seconds: number, fps: number): number {
 export function framesToSeconds(frames: number, fps: number): number {
   return frames / fps;
 }
+
+
