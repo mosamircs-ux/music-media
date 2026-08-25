@@ -9,14 +9,13 @@ import {
   Video,
   Play,
   Pause,
-  Plus,
-  Trash2,
   RefreshCw,
   Settings,
   Search,
   Download,
   Film,
 } from "lucide-react";
+
 import {
   Button,
   Input,
@@ -37,8 +36,10 @@ import { MOCK_TRACKS } from "@/lib/mockData";
 import { useRouter } from "@/i18n/routing";
 import { AudioTimelineEditor } from "@/components/AudioTimelineEditor";
 import { CaptionEditor } from "@/components/CaptionEditor";
+import { ScenePlanner } from "@/components/ScenePlanner";
 
 export default function CreateWorkspacePage() {
+
 
 
   const t = useTranslations("create");
@@ -55,13 +56,10 @@ export default function CreateWorkspacePage() {
     currentTime,
     selectTrack,
     updateSelection,
-    addScene,
-    removeScene,
     setIsPlaying,
     setCurrentTime,
     setVideoConfig,
   } = useProjectStore();
-
 
   // Track fallback
   const activeTrack = selectedTrack || MOCK_TRACKS[0];
@@ -72,11 +70,8 @@ export default function CreateWorkspacePage() {
   // States
   const isLooping = true;
   const [activeTabLeft, setActiveTabLeft] = React.useState<"music" | "captions" | "scenes">("music");
-  const [newScenePrompt, setNewScenePrompt] = React.useState("");
-
   const [selectedStyle, setSelectedStyle] = React.useState<VisualStyle>("Cinematic");
   const [searchMusicQuery, setSearchMusicQuery] = React.useState("");
-  const [isEnhancing, setIsEnhancing] = React.useState(false);
 
   // Export Modal State
   const [isExportModalOpen, setIsExportModalOpen] = React.useState(false);
@@ -118,24 +113,6 @@ export default function CreateWorkspacePage() {
     }, 400);
   };
 
-  const handleAddSceneSubmit = (e: React.FormEvent) => {
-    e.preventDefault();
-    if (!newScenePrompt.trim()) return;
-    addScene(newScenePrompt, 5);
-    setNewScenePrompt("");
-  };
-
-
-  const handleEnhancePrompt = () => {
-    if (!newScenePrompt.trim()) return;
-    setIsEnhancing(true);
-    setTimeout(() => {
-      setNewScenePrompt(
-        `Cinematic ${selectedStyle} atmosphere: "${newScenePrompt}", anamorphic lens flares, dynamic camera motion, 9:16 vertical render`
-      );
-      setIsEnhancing(false);
-    }, 600);
-  };
 
   const visualStylesList: VisualStyle[] = [
     "Cinematic",
@@ -304,59 +281,14 @@ export default function CreateWorkspacePage() {
 
             {/* SUB-TAB 2: AI SCENES */}
             {activeTabLeft === "scenes" && (
-              <div className="space-y-4">
-                <form onSubmit={handleAddSceneSubmit} className="space-y-3 p-3 rounded-2xl bg-secondary/30 border border-white/5">
-                  <label className="text-xs font-bold text-foreground flex items-center justify-between">
-                    <span>Prompt Visual Scene</span>
-                    <button
-                      type="button"
-                      onClick={handleEnhancePrompt}
-                      disabled={isEnhancing || !newScenePrompt.trim()}
-                      className="text-[10px] text-purple-400 hover:underline flex items-center gap-1 font-semibold"
-                    >
-                      <Sparkles className="h-3 w-3" />
-                      {isEnhancing ? "Enhancing..." : "Enhance Prompt"}
-                    </button>
-                  </label>
-                  <Input
-                    value={newScenePrompt}
-                    onChange={(e) => setNewScenePrompt(e.target.value)}
-                    placeholder="Describe scene visual vibe..."
-                    className="h-9 text-xs rounded-xl bg-background/80"
-                  />
-                  <Button type="submit" variant="gradient" size="sm" className="w-full rounded-xl text-xs font-bold">
-                    <Plus className="h-3.5 w-3.5 mr-1" /> Add Scene
-                  </Button>
-                </form>
-
-                {/* Scene List */}
-                <div className="space-y-2">
-                  {scenes.length === 0 ? (
-                    <div className="text-center py-8 text-xs text-muted-foreground space-y-2">
-                      <Sparkles className="h-8 w-8 mx-auto text-muted-foreground/40" />
-                      <p>No visual scenes yet. Prompt one above or use a template.</p>
-                    </div>
-                  ) : (
-                    scenes.map((scene, idx) => (
-                      <div key={scene.id} className="p-3 rounded-xl bg-secondary/40 border border-white/5 flex items-center justify-between gap-2">
-                        <div className="flex items-center gap-2.5 min-w-0">
-                          <span className="h-6 w-6 rounded-lg bg-purple-500/20 text-purple-300 font-bold text-xs flex items-center justify-center flex-shrink-0">
-                            {idx + 1}
-                          </span>
-                          <p className="text-xs text-foreground truncate">{scene.prompt}</p>
-                        </div>
-                        <div className="flex items-center gap-2">
-                          <Badge variant="secondary" className="text-[9px]">{scene.duration}s</Badge>
-                          <button onClick={() => removeScene(scene.id)} className="text-muted-foreground hover:text-rose-500 p-1">
-                            <Trash2 className="h-3.5 w-3.5" />
-                          </button>
-                        </div>
-                      </div>
-                    ))
-                  )}
-                </div>
-              </div>
+              <ScenePlanner
+                track={activeTrack}
+                startTime={startTime}
+                endTime={endTime}
+                totalDuration={selectedDuration}
+              />
             )}
+
 
             {/* SUB-TAB 3: CAPTIONS */}
             {activeTabLeft === "captions" && (

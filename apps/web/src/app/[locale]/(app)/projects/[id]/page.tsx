@@ -12,9 +12,8 @@ import {
   Download,
   Play,
   Pause,
-  Plus,
-  Trash2,
 } from "lucide-react";
+
 import {
   Button,
   Input,
@@ -30,16 +29,18 @@ import {
 import { useProjectStore } from "@/stores/projectStore";
 import {
   formatTime,
-  type VisualStyle,
   type TransitionType,
 } from "@musicmotion/shared";
+
 
 import { MOCK_TRACKS } from "@/lib/mockData";
 import { useRouter } from "@/i18n/routing";
 import { AudioTimelineEditor } from "@/components/AudioTimelineEditor";
 import { CaptionEditor } from "@/components/CaptionEditor";
+import { ScenePlanner } from "@/components/ScenePlanner";
 
 export default function ProjectEditorPage() {
+
   const t = useTranslations("editor");
   const router = useRouter();
 
@@ -51,8 +52,6 @@ export default function ProjectEditorPage() {
     isPlaying,
     currentTime,
     updateSelection,
-    addScene,
-    removeScene,
     setIsPlaying,
     setCurrentTime,
   } = useProjectStore();
@@ -60,11 +59,6 @@ export default function ProjectEditorPage() {
   const [activeSection, setActiveSection] = React.useState<
     "music" | "captions" | "visuals" | "scenes" | "style" | "transitions" | "export"
   >("captions");
-
-  const [newScenePrompt, setNewScenePrompt] = React.useState("");
-
-  const [selectedStyle, setSelectedStyle] = React.useState<VisualStyle>("Cinematic");
-  const [isEnhancing, setIsEnhancing] = React.useState(false);
 
   // Export Modal
   const [isExportOpen, setIsExportOpen] = React.useState(false);
@@ -93,17 +87,6 @@ export default function ProjectEditorPage() {
     return () => clearInterval(interval);
   }, [isPlaying, duration, setCurrentTime]);
 
-  const handleEnhancePrompt = () => {
-
-    if (!newScenePrompt.trim()) return;
-    setIsEnhancing(true);
-    setTimeout(() => {
-      setNewScenePrompt(
-        `Ultra-detailed ${selectedStyle} cinematography of ${newScenePrompt}, volumetric god rays, hyper-realistic textures, 9:16 vertical render`
-      );
-      setIsEnhancing(false);
-    }, 500);
-  };
 
   const handleStartRender = () => {
     setIsRendering(true);
@@ -122,19 +105,8 @@ export default function ProjectEditorPage() {
     }, 400);
   };
 
-  const visualStylesList: VisualStyle[] = [
-    "Cinematic",
-    "Anime",
-    "Realistic",
-    "Dreamy",
-    "Dark",
-    "Retro",
-    "Fantasy",
-    "Minimal",
-    "Music Video",
-  ];
-
   const transitionsList: { value: TransitionType; label: string }[] = [
+
     { value: "fade", label: "Smooth Crossfade" },
     { value: "dissolve", label: "Film Dissolve" },
     { value: "slide_left", label: "Slide Left" },
@@ -255,91 +227,16 @@ export default function ProjectEditorPage() {
           )}
 
 
-          {/* SECTION 3: VISUALS */}
-          {activeSection === "visuals" && (
-            <div className="space-y-4">
-              <h3 className="text-sm font-bold text-foreground">AI Visual Style & Prompts</h3>
-              <div className="p-4 rounded-2xl bg-secondary/30 border border-white/5 space-y-4 text-xs">
-                <div>
-                  <label className="font-semibold text-muted-foreground block mb-1">Select Preset Style (9 Styles)</label>
-                  <div className="grid grid-cols-3 gap-2">
-                    {visualStylesList.map((st) => (
-                      <button
-                        key={st}
-                        onClick={() => setSelectedStyle(st)}
-                        className={`p-2 rounded-xl text-xs font-bold border transition-all ${
-                          selectedStyle === st
-                            ? "border-purple-500 bg-purple-500/20 text-purple-200"
-                            : "border-white/5 bg-secondary/40 text-muted-foreground"
-                        }`}
-                      >
-                        {st}
-                      </button>
-                    ))}
-                  </div>
-                </div>
-
-                <div className="space-y-2 pt-2">
-                  <div className="flex items-center justify-between">
-                    <label className="font-semibold text-muted-foreground">Scene Visual Prompt</label>
-                    <button
-                      onClick={handleEnhancePrompt}
-                      disabled={isEnhancing || !newScenePrompt.trim()}
-                      className="text-[10px] text-purple-400 hover:underline flex items-center gap-1 font-semibold"
-                    >
-                      <Sparkles className="h-3 w-3" />
-                      {isEnhancing ? "Enhancing..." : "Enhance with AI"}
-                    </button>
-                  </div>
-                  <Input
-                    value={newScenePrompt}
-                    onChange={(e) => setNewScenePrompt(e.target.value)}
-                    placeholder="Describe scene visual atmosphere..."
-                    className="h-10 text-xs bg-background/80"
-                  />
-                  <Button
-                    variant="gradient"
-                    size="sm"
-                    onClick={() => {
-                      if (newScenePrompt.trim()) {
-                        addScene(newScenePrompt, 5);
-                        setNewScenePrompt("");
-                      }
-                    }}
-                    className="w-full rounded-xl font-bold"
-                  >
-                    <Plus className="h-4 w-4 mr-1.5" /> Generate & Add Scene
-                  </Button>
-                </div>
-              </div>
-            </div>
+          {/* SECTION 3 & 4: VISUALS & SCENES */}
+          {(activeSection === "visuals" || activeSection === "scenes") && (
+            <ScenePlanner
+              track={activeTrack}
+              startTime={startTime}
+              endTime={endTime}
+              totalDuration={duration}
+            />
           )}
 
-
-          {/* SECTION 4: SCENES */}
-          {activeSection === "scenes" && (
-            <div className="space-y-4">
-              <h3 className="text-sm font-bold text-foreground">Scene Sequence & Transitions</h3>
-              <div className="space-y-2">
-                {scenes.map((sc, i) => (
-                  <div key={sc.id} className="p-3 rounded-2xl bg-secondary/30 border border-white/5 flex items-center justify-between">
-                    <div className="flex items-center gap-3">
-                      <span className="h-7 w-7 rounded-xl bg-purple-500/20 text-purple-300 font-bold text-xs flex items-center justify-center">
-                        {i + 1}
-                      </span>
-                      <div>
-                        <p className="text-xs font-bold text-foreground truncate max-w-xs">{sc.prompt}</p>
-                        <p className="text-[10px] text-muted-foreground">Duration: {sc.duration}s</p>
-                      </div>
-                    </div>
-                    <button onClick={() => removeScene(sc.id)} className="text-muted-foreground hover:text-rose-500 p-1">
-                      <Trash2 className="h-4 w-4" />
-                    </button>
-                  </div>
-                ))}
-              </div>
-            </div>
-          )}
 
           {/* SECTION 5: STYLE */}
           {activeSection === "style" && (

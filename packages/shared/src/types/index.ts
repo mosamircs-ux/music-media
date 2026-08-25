@@ -72,11 +72,15 @@ export interface NormalizedTrack {
   waveformUrl?: string;
   bpm?: number;
   tags?: string[];
+  genre?: string;
+  mood?: string;
+  tempo?: string;
   isAvailableForVideo: boolean;
   licenseInfo: LicenseInfo;
   license: LicenseInfo; // backwards compatibility alias for licenseInfo
   lyrics?: string;
 }
+
 
 // Backward compatibility Track alias
 export type Track = NormalizedTrack;
@@ -259,9 +263,99 @@ export interface Scene {
   videoUrl?: string;
   order: number;
   duration: number; // in seconds
+  startTime?: number;
+  endTime?: number;
+  mood?: string;
+  camera?: string;
   transition?: Transition;
   status: "idle" | "generating" | "completed" | "failed";
 }
+
+/**
+ * AI Scene Planning & Storyboard
+ */
+export interface PlannedScene {
+  id: string;
+  order: number;
+  startTime: number;
+  endTime: number;
+  duration: number;
+  prompt: string;
+  negativePrompt?: string;
+  mood: string;
+  camera: string;
+  transition: TransitionType | string;
+  transitionDuration?: number;
+  captionSuggestions?: string[];
+  visualContinuityNotes?: string;
+  imageUrl?: string;
+}
+
+export interface ScenePlan {
+  title: string;
+  visualConcept: string;
+  visualStyle: VisualStyle | string;
+  mood: string;
+  colorPalette: string[];
+  continuityGuidelines: string;
+  totalDuration: number;
+  scenes: PlannedScene[];
+  createdAt?: string;
+}
+
+export interface ScenePlanInput {
+  track: NormalizedTrack;
+  startTime: number;
+  endTime: number;
+  duration?: number;
+  captions?: Caption[];
+  visualStyle?: VisualStyle | string;
+  userDescription?: string;
+  referenceImage?: string;
+  targetSceneCount?: number;
+  aspectRatio?: AspectRatio;
+}
+
+export interface MusicAnalysisResult {
+  genre: string;
+  mood: string;
+  energy: "low" | "medium" | "high" | "explosive";
+  bpm?: number;
+  suggestedPacing: "fast-cuts" | "medium-dynamic" | "slow-cinematic";
+  recommendedSceneCount: number;
+  storyTheme: string;
+}
+
+export interface ScenePromptContext {
+  track: NormalizedTrack;
+  visualStyle: string;
+  sceneIndex: number;
+  totalScenes: number;
+  captionText?: string;
+  mood?: string;
+  camera?: string;
+  previousPrompt?: string;
+  continuityGuidelines?: string;
+}
+
+export interface CaptionStyleSuggestion {
+  preset: CaptionPresetStyle;
+  animation: CaptionAnimation;
+  fontFamily: string;
+  color: string;
+  background: string;
+  rationale: string;
+}
+
+export interface AIProvider {
+  readonly id: string;
+  readonly name: string;
+  generateScenePlan(input: ScenePlanInput): Promise<ScenePlan>;
+  generateVisualPrompt(context: ScenePromptContext): Promise<string>;
+  generateCaptionStyle(track: NormalizedTrack, visualStyle: string): Promise<CaptionStyleSuggestion>;
+  analyzeMusic(track: NormalizedTrack, lyrics?: string[]): Promise<MusicAnalysisResult>;
+}
+
 
 /**
  * Video Rendering & Project Settings

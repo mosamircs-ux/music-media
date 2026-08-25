@@ -1,12 +1,14 @@
 import { create } from "zustand";
 import type {
   Project,
-
   Track,
   TrackSelection,
   Caption,
   CaptionPresetStyle,
   Scene,
+  ScenePlan,
+  VisualStyle,
+  TransitionType,
   VideoConfig,
   Locale,
 } from "@musicmotion/shared";
@@ -40,13 +42,17 @@ interface ProjectState {
   splitCaption: (id: string, splitTime?: number) => void;
   mergeCaptions: (id1: string, id2: string) => void;
   setAllCaptionsStyle: (style: CaptionPresetStyle) => void;
-  addScene: (prompt: string, duration?: number) => void;
+  setScenes: (scenes: Scene[]) => void;
+  addScene: (prompt: string, duration?: number, options?: Partial<Scene>) => void;
   updateScene: (id: string, updates: Partial<Scene>) => void;
   removeScene: (id: string) => void;
+  reorderScenes: (fromIndex: number, toIndex: number) => void;
+  applyScenePlan: (plan: ScenePlan) => void;
   setIsPlaying: (isPlaying: boolean) => void;
   setCurrentTime: (currentTime: number | ((prev: number) => number)) => void;
   setVideoConfig: (config: Partial<VideoConfig>) => void;
 }
+
 
 
 export const useProjectStore = create<ProjectState>((set, get) => ({
@@ -230,7 +236,9 @@ export const useProjectStore = create<ProjectState>((set, get) => ({
   },
 
 
-  addScene: (prompt: string, duration = 3) => {
+  setScenes: (scenes: Scene[]) => set({ scenes }),
+
+  addScene: (prompt: string, duration = 3, options?: Partial<Scene>) => {
     const { currentProject, scenes } = get();
     const projectId = currentProject?.id || generateId();
 
@@ -245,6 +253,7 @@ export const useProjectStore = create<ProjectState>((set, get) => ({
         duration: 0.5,
       },
       status: "idle",
+      ...options,
     };
 
     set({ scenes: [...scenes, newScene] });
@@ -258,9 +267,58 @@ export const useProjectStore = create<ProjectState>((set, get) => ({
 
   removeScene: (id: string) => {
     set((state) => ({
-      scenes: state.scenes.filter((s) => s.id !== id),
+      scenes: state.scenes
+        .filter((s) => s.id !== id)
+        .map((s, idx) => ({ ...s, order: idx })),
     }));
   },
+
+  reorderScenes: (fromIndex: number, toIndex: number) => {
+    const { scenes } = get();
+    if (
+      fromIndex < 0 ||
+      fromIndex >= scenes.length ||
+      toIndex < 0 ||
+      toIndex >= scenes.length ||
+      fromIndex === toIndex
+    ) {
+      return;
+    }
+
+    const reordered = [...scenes];
+    const [moved] = reordered.splice(fromIndex, 1);
+    reordered.splice(toIndex, 0, moved);
+
+    set({
+      scenes: reordered.map((s, idx) => ({ ...s, order: idx })),
+    });
+  },
+
+  applyScenePlan: (plan: ScenePlan) => {
+    const { currentProject } = get();
+    const projectId = currentProject?.id || generateId();
+
+    const convertedScenes: Scene[] = plan.scenes.map((sc, idx) => ({
+      id: sc.id || generateId(),
+      projectId,
+      prompt: sc.prompt,
+      order: idx,
+      duration: sc.duration,
+      startTime: sc.startTime,
+      endTime: sc.endTime,
+      mood: sc.mood,
+      camera: sc.camera,
+      visualStyle: (plan.visualStyle as VisualStyle) || "Cinematic",
+      transition: {
+        type: (sc.transition as TransitionType) || "fade",
+        duration: sc.transitionDuration || 0.5,
+      },
+      status: "idle",
+    }));
+
+    set({ scenes: convertedScenes });
+  },
+
 
   setIsPlaying: (isPlaying: boolean) => set({ isPlaying }),
   setCurrentTime: (currentTime: number | ((prev: number) => number)) =>
