@@ -29,6 +29,19 @@ enum SceneStatus {
   FAILED
 }
 
+enum AssetStatus {
+  QUEUED
+  PROCESSING
+  COMPLETED
+  FAILED
+  CANCELLED
+}
+
+enum AssetType {
+  IMAGE
+  VIDEO
+}
+
 enum RenderJobStatus {
   QUEUED
   PROCESSING
@@ -47,6 +60,7 @@ model Project {
   captions       Caption[]
   scenes         Scene[]
   renderJobs     RenderJob[]
+  generatedAssets GeneratedAsset[]
   videoWidth     Int             @default(1080)
   videoHeight    Int             @default(1920)
   videoFps       Int             @default(30)
@@ -133,6 +147,7 @@ model Scene {
   transitionType  String?     @default("fade")
   transitionDur   Float?      @default(0.5)
   status          SceneStatus @default(IDLE)
+  generatedAssets GeneratedAsset[]
   createdAt       DateTime    @default(now())
   updatedAt       DateTime    @updatedAt
 
@@ -155,3 +170,34 @@ model RenderJob {
   @@index([projectId])
   @@index([status])
 }
+
+model GeneratedAsset {
+  id             String      @id @default(uuid())
+  projectId      String
+  project        Project     @relation(fields: [projectId], references: [id], onDelete: Cascade)
+  sceneId        String
+  scene          Scene       @relation(fields: [sceneId], references: [id], onDelete: Cascade)
+  provider       String
+  type           AssetType   @default(IMAGE)
+  prompt         String
+  negativePrompt String?
+  status         AssetStatus @default(QUEUED)
+  sourceUrl      String?
+  storageUrl     String?
+  previewUrl     String?
+  width          Int?
+  height         Int?
+  duration       Float?
+  creditCost     Int         @default(1)
+  errorMessage   String?
+  metadata       Json?
+  startedAt      DateTime?
+  completedAt    DateTime?
+  createdAt      DateTime    @default(now())
+  updatedAt      DateTime    @updatedAt
+
+  @@index([projectId])
+  @@index([sceneId])
+  @@index([status])
+}
+

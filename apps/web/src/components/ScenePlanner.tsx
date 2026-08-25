@@ -11,6 +11,7 @@ import {
   RefreshCw,
   Video,
   Camera,
+  ImagePlay,
 } from "lucide-react";
 import { Button, Input, Badge } from "@musicmotion/ui";
 
@@ -24,9 +25,11 @@ import {
 } from "@musicmotion/shared";
 import { useProjectStore } from "@/stores/projectStore";
 import { aiScenePlanner } from "@musicmotion/ai";
+import { SceneGenerationPanel } from "./SceneGenerationPanel";
 
 export interface ScenePlannerProps {
   track?: NormalizedTrack;
+  projectId?: string;
   startTime?: number;
   endTime?: number;
   totalDuration?: number;
@@ -58,6 +61,7 @@ const TRANSITION_TYPES: Array<{ value: TransitionType; label: string }> = [
 
 export function ScenePlanner({
   track,
+  projectId = "dev-project",
   startTime = 0,
   endTime = 15,
   totalDuration = 15,
@@ -275,7 +279,31 @@ export function ScenePlanner({
       <div className="space-y-3">
         <div className="flex items-center justify-between text-xs font-bold text-muted-foreground px-1">
           <span>Storyboard Scenes</span>
-          <span className="text-[10px] font-mono">0:00 ─── {formatTime(totalDuration)}</span>
+          <div className="flex items-center gap-2">
+            <span className="text-[10px] font-mono">0:00 ─── {formatTime(totalDuration)}</span>
+            {scenes.length > 0 && (
+              <button
+                type="button"
+                title="Generate visuals for all scenes"
+                className="flex items-center gap-1 text-[10px] font-semibold bg-purple-500/15 border border-purple-500/25 text-purple-300 px-2 py-0.5 rounded-lg hover:bg-purple-500/25 transition-all"
+                onClick={() => {
+                  scenes.forEach((scene) => {
+                    fetch("/api/generate/scene", {
+                      method: "POST",
+                      headers: { "Content-Type": "application/json" },
+                      body: JSON.stringify({
+                        projectId,
+                        scenes: [{ sceneId: scene.id, prompt: scene.prompt, visualStyle }],
+                      }),
+                    }).catch(console.error);
+                  });
+                }}
+              >
+                <ImagePlay className="h-3 w-3" />
+                Generate All
+              </button>
+            )}
+          </div>
         </div>
 
         {scenes.length === 0 ? (
@@ -408,6 +436,13 @@ export function ScenePlanner({
                     </select>
                   </div>
                 </div>
+
+                {/* Visual Generation Panel */}
+                <SceneGenerationPanel
+                  scene={scene}
+                  projectId={projectId}
+                  visualStyle={visualStyle}
+                />
               </div>
             );
           })

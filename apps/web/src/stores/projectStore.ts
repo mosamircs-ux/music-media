@@ -11,6 +11,7 @@ import type {
   TransitionType,
   VideoConfig,
   Locale,
+  GenerationJobStatus,
 } from "@musicmotion/shared";
 import {
   generateId,
@@ -26,6 +27,8 @@ interface ProjectState {
   trackSelection: TrackSelection | null;
   captions: Caption[];
   scenes: Scene[];
+  /** Generation job status keyed by sceneId */
+  generationJobs: Record<string, GenerationJobStatus>;
   videoConfig: VideoConfig;
   isPlaying: boolean;
   currentTime: number;
@@ -48,6 +51,8 @@ interface ProjectState {
   removeScene: (id: string) => void;
   reorderScenes: (fromIndex: number, toIndex: number) => void;
   applyScenePlan: (plan: ScenePlan) => void;
+  setGenerationJob: (sceneId: string, job: GenerationJobStatus) => void;
+  clearGenerationJob: (sceneId: string) => void;
   setIsPlaying: (isPlaying: boolean) => void;
   setCurrentTime: (currentTime: number | ((prev: number) => number)) => void;
   setVideoConfig: (config: Partial<VideoConfig>) => void;
@@ -61,6 +66,7 @@ export const useProjectStore = create<ProjectState>((set, get) => ({
   trackSelection: null,
   captions: [],
   scenes: [],
+  generationJobs: {},
   videoConfig: {
     width: 1080,
     height: 1920,
@@ -329,4 +335,15 @@ export const useProjectStore = create<ProjectState>((set, get) => ({
     set((state) => ({
       videoConfig: { ...state.videoConfig, ...config },
     })),
+
+  setGenerationJob: (sceneId: string, job: GenerationJobStatus) =>
+    set((state) => ({
+      generationJobs: { ...state.generationJobs, [sceneId]: job },
+    })),
+
+  clearGenerationJob: (sceneId: string) =>
+    set((state) => {
+      const { [sceneId]: _removed, ...rest } = state.generationJobs;
+      return { generationJobs: rest };
+    }),
 }));

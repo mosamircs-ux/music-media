@@ -30,7 +30,8 @@
     "tailwind-merge": "^3.0.2",
     "wavesurfer.js": "^7.8.15",
     "zod": "^3.24.2",
-    "zustand": "^5.0.3"
+    "zustand": "^5.0.3",
+    "bullmq": "^5.41.6"
   },
   "devDependencies": {
     "@musicmotion/eslint-config": "workspace:*",

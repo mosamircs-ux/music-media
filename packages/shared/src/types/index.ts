@@ -358,6 +358,90 @@ export interface AIProvider {
 
 
 /**
+ * Visual Asset Generation
+ */
+export type AssetStatus = "queued" | "processing" | "completed" | "failed" | "cancelled";
+export type AssetType = "image" | "video";
+
+export interface GeneratedAsset {
+  id: string;
+  projectId: string;
+  sceneId: string;
+  provider: string;
+  type: AssetType;
+  prompt: string;
+  negativePrompt?: string;
+  status: AssetStatus;
+  /** URL returned by the provider (may be temporary) */
+  sourceUrl?: string;
+  /** URL of the asset stored in our own storage */
+  storageUrl?: string;
+  previewUrl?: string;
+  width?: number;
+  height?: number;
+  duration?: number; // seconds (for video assets)
+  creditCost?: number;
+  errorMessage?: string;
+  metadata?: Record<string, unknown>;
+  startedAt?: string;
+  completedAt?: string;
+  createdAt: string;
+  updatedAt: string;
+}
+
+export interface VisualGenerationRequest {
+  sceneId: string;
+  projectId: string;
+  prompt: string;
+  negativePrompt?: string;
+  visualStyle?: VisualStyle | string;
+  width?: number;
+  height?: number;
+  /** Number of inference steps (provider-specific, default 30) */
+  steps?: number;
+  /** Guidance scale (provider-specific, default 7.5) */
+  guidanceScale?: number;
+  /** Seed for reproducible generation */
+  seed?: number;
+}
+
+export interface VisualGenerationResult {
+  jobId: string;
+  assetId: string;
+  status: AssetStatus;
+  progress: number; // 0–100
+  sourceUrl?: string;
+  storageUrl?: string;
+  previewUrl?: string;
+  width?: number;
+  height?: number;
+  error?: string;
+}
+
+export interface VisualGenerationProvider {
+  readonly id: string;
+  readonly name: string;
+  readonly supportsVideo: boolean;
+  generateImage(request: VisualGenerationRequest): Promise<VisualGenerationResult>;
+  generateVideo?(request: VisualGenerationRequest): Promise<VisualGenerationResult>;
+  getGenerationStatus(jobId: string): Promise<VisualGenerationResult>;
+  cancelGeneration(jobId: string): Promise<{ cancelled: boolean }>;
+}
+
+/** Shape returned by GET /api/generate/status/[jobId] */
+export interface GenerationJobStatus {
+  jobId: string;
+  assetId: string;
+  sceneId: string;
+  status: AssetStatus;
+  progress: number;
+  previewUrl?: string;
+  storageUrl?: string;
+  error?: string;
+  updatedAt: string;
+}
+
+/**
  * Video Rendering & Project Settings
  */
 export type AspectRatio = "9:16" | "16:9" | "1:1";

@@ -231,6 +231,7 @@ export default function ProjectEditorPage() {
           {(activeSection === "visuals" || activeSection === "scenes") && (
             <ScenePlanner
               track={activeTrack}
+              projectId={currentProject?.id || "project-editor"}
               startTime={startTime}
               endTime={endTime}
               totalDuration={duration}

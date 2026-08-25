@@ -93,3 +93,161 @@ body {
 .glow-purple {
   box-shadow: 0 0 50px -10px rgba(168, 85, 247, 0.35);
 }
+
+/* ================================================================
+   SceneGenerationPanel
+   ================================================================ */
+.scene-gen-panel {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  margin-top: 10px;
+}
+
+.scene-gen-preview {
+  position: relative;
+  border-radius: 8px;
+  overflow: hidden;
+  background: rgba(255, 255, 255, 0.04);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+.scene-gen-thumb {
+  width: 100%;
+  height: 120px;
+  object-fit: cover;
+  display: block;
+  border-radius: 7px;
+}
+
+/* Progress */
+.scene-gen-progress-wrap {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.scene-gen-progress-track {
+  width: 100%;
+  height: 6px;
+  background: rgba(255, 255, 255, 0.08);
+  border-radius: 99px;
+  overflow: hidden;
+}
+
+.scene-gen-progress-fill {
+  height: 100%;
+  background: linear-gradient(90deg, #7c3aed, #a855f7, #ec4899);
+  border-radius: 99px;
+  transition: width 0.6s ease;
+  background-size: 200% 100%;
+  animation: gen-shimmer 1.4s linear infinite;
+}
+
+@keyframes gen-shimmer {
+  0%   { background-position: 0% 0%; }
+  100% { background-position: 200% 0%; }
+}
+
+.scene-gen-progress-label {
+  font-size: 11px;
+  color: rgba(255,255,255,0.5);
+  font-family: 'Inter', sans-serif;
+}
+
+/* Status badge */
+.scene-gen-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 3px 8px;
+  border-radius: 99px;
+  font-size: 11px;
+  font-weight: 500;
+  font-family: 'Inter', sans-serif;
+  width: fit-content;
+}
+
+.scene-gen-badge.completed { background: rgba(34, 197, 94, 0.18); color: #4ade80; border: 1px solid rgba(74,222,128,0.25); }
+.scene-gen-badge.failed    { background: rgba(239, 68, 68, 0.15); color: #f87171; border: 1px solid rgba(248,113,113,0.25); }
+.scene-gen-badge.cancelled { background: rgba(255,255,255,0.07); color: rgba(255,255,255,0.45); border: 1px solid rgba(255,255,255,0.1); }
+
+.scene-gen-badge.completed.thumbnail {
+  position: absolute;
+  top: 6px;
+  right: 6px;
+  background: rgba(0,0,0,0.55);
+  backdrop-filter: blur(4px);
+}
+
+/* Error */
+.scene-gen-error {
+  font-size: 11px;
+  color: #f87171;
+  font-family: 'Inter', sans-serif;
+  margin: 0;
+}
+
+/* Buttons */
+.scene-gen-actions {
+  display: flex;
+  gap: 6px;
+  flex-wrap: wrap;
+}
+
+.scene-gen-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  padding: 5px 12px;
+  border-radius: 6px;
+  font-size: 12px;
+  font-weight: 500;
+  font-family: 'Inter', sans-serif;
+  border: none;
+  cursor: pointer;
+  transition: all 0.15s ease;
+}
+
+.scene-gen-btn:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+}
+
+.scene-gen-btn.primary {
+  background: linear-gradient(135deg, #7c3aed, #a855f7);
+  color: #fff;
+}
+.scene-gen-btn.primary:not(:disabled):hover {
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(139, 92, 246, 0.4);
+}
+
+.scene-gen-btn.secondary {
+  background: rgba(255,255,255,0.08);
+  color: rgba(255,255,255,0.8);
+  border: 1px solid rgba(255,255,255,0.12);
+}
+.scene-gen-btn.secondary:hover { background: rgba(255,255,255,0.12); }
+
+.scene-gen-btn.cancel {
+  background: rgba(239, 68, 68, 0.12);
+  color: #f87171;
+  border: 1px solid rgba(239,68,68,0.25);
+}
+.scene-gen-btn.cancel:hover { background: rgba(239, 68, 68, 0.2); }
+
+/* Spinner */
+.scene-gen-spinner {
+  width: 12px;
+  height: 12px;
+  border: 2px solid rgba(255,255,255,0.3);
+  border-top-color: #fff;
+  border-radius: 50%;
+  animation: gen-spin 0.7s linear infinite;
+  display: inline-block;
+}
+
+@keyframes gen-spin {
+  to { transform: rotate(360deg); }
+}

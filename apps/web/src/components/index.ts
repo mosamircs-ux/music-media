@@ -1,6 +1,7 @@
 export * from "./AudioTimelineEditor";
 export * from "./CaptionEditor";
 export * from "./ScenePlanner";
+export * from "./SceneGenerationPanel";
 export * from "./Navbar";
 
 

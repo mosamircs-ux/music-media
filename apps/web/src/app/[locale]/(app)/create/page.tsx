@@ -283,6 +283,7 @@ export default function CreateWorkspacePage() {
             {activeTabLeft === "scenes" && (
               <ScenePlanner
                 track={activeTrack}
+                projectId={currentProject?.id || "create-draft"}
                 startTime={startTime}
                 endTime={endTime}
                 totalDuration={selectedDuration}
