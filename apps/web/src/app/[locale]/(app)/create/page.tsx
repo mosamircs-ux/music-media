@@ -36,8 +36,10 @@ import { formatTime, type VisualStyle, type AspectRatio } from "@musicmotion/sha
 import { MOCK_TRACKS } from "@/lib/mockData";
 import { useRouter } from "@/i18n/routing";
 import { AudioTimelineEditor } from "@/components/AudioTimelineEditor";
+import { CaptionEditor } from "@/components/CaptionEditor";
 
 export default function CreateWorkspacePage() {
+
 
   const t = useTranslations("create");
   const editorT = useTranslations("editor");
@@ -53,14 +55,13 @@ export default function CreateWorkspacePage() {
     currentTime,
     selectTrack,
     updateSelection,
-    addCaption,
-    removeCaption,
     addScene,
     removeScene,
     setIsPlaying,
     setCurrentTime,
     setVideoConfig,
   } = useProjectStore();
+
 
   // Track fallback
   const activeTrack = selectedTrack || MOCK_TRACKS[0];
@@ -71,8 +72,8 @@ export default function CreateWorkspacePage() {
   // States
   const isLooping = true;
   const [activeTabLeft, setActiveTabLeft] = React.useState<"music" | "captions" | "scenes">("music");
-  const [newCaptionText, setNewCaptionText] = React.useState("");
   const [newScenePrompt, setNewScenePrompt] = React.useState("");
+
   const [selectedStyle, setSelectedStyle] = React.useState<VisualStyle>("Cinematic");
   const [searchMusicQuery, setSearchMusicQuery] = React.useState("");
   const [isEnhancing, setIsEnhancing] = React.useState(false);
@@ -117,19 +118,13 @@ export default function CreateWorkspacePage() {
     }, 400);
   };
 
-  const handleAddCaptionSubmit = (e: React.FormEvent) => {
-    e.preventDefault();
-    if (!newCaptionText.trim()) return;
-    addCaption(newCaptionText, Math.max(0, currentTime), Math.min(currentTime + 3, selectedDuration));
-    setNewCaptionText("");
-  };
-
   const handleAddSceneSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     if (!newScenePrompt.trim()) return;
     addScene(newScenePrompt, 5);
     setNewScenePrompt("");
   };
+
 
   const handleEnhancePrompt = () => {
     if (!newScenePrompt.trim()) return;
@@ -365,43 +360,11 @@ export default function CreateWorkspacePage() {
 
             {/* SUB-TAB 3: CAPTIONS */}
             {activeTabLeft === "captions" && (
-              <div className="space-y-4">
-                <form onSubmit={handleAddCaptionSubmit} className="space-y-3 p-3 rounded-2xl bg-secondary/30 border border-white/5">
-                  <label className="text-xs font-bold text-foreground">Add Lyric / Subtitle</label>
-                  <Input
-                    value={newCaptionText}
-                    onChange={(e) => setNewCaptionText(e.target.value)}
-                    placeholder="Enter lyric or caption text..."
-                    className="h-9 text-xs rounded-xl bg-background/80"
-                  />
-                  <Button type="submit" variant="gradient" size="sm" className="w-full rounded-xl text-xs font-bold">
-                    <Plus className="h-3.5 w-3.5 mr-1" /> Add at Current Time ({formatTime(currentTime)})
-                  </Button>
-                </form>
-
-                <div className="space-y-2">
-                  {captions.length === 0 ? (
-                    <div className="text-center py-8 text-xs text-muted-foreground space-y-2">
-                      <CaptionsIcon className="h-8 w-8 mx-auto text-muted-foreground/40" />
-                      <p>No captions added. Type lyrics to sync with audio beats.</p>
-                    </div>
-                  ) : (
-                    captions.map((cap) => (
-                      <div key={cap.id} className="p-3 rounded-xl bg-secondary/40 border border-white/5 flex items-center justify-between gap-2">
-                        <div className="min-w-0">
-                          <p className="text-xs font-bold text-foreground truncate">{cap.text}</p>
-                          <span className="text-[10px] text-muted-foreground font-mono">
-                            {formatTime(cap.startTime)} - {formatTime(cap.endTime)}
-                          </span>
-                        </div>
-                        <button onClick={() => removeCaption(cap.id)} className="text-muted-foreground hover:text-rose-500 p-1">
-                          <Trash2 className="h-3.5 w-3.5" />
-                        </button>
-                      </div>
-                    ))
-                  )}
-                </div>
-              </div>
+              <CaptionEditor
+                track={activeTrack}
+                currentTime={currentTime >= startTime ? currentTime - startTime : currentTime}
+                totalDuration={selectedDuration}
+              />
             )}
           </div>
         </div>
@@ -432,16 +395,30 @@ export default function CreateWorkspacePage() {
               </div>
 
               {/* Real-time Dynamic Captions Overlay */}
-              <div className="relative z-10 text-center">
-                {captions.length > 0 ? (
-                  <div className="inline-block bg-black/75 backdrop-blur-md px-3.5 py-1.5 rounded-xl border border-white/20 text-white font-black text-xs shadow-xl animate-bounce">
-                    {captions[0].text}
-                  </div>
-                ) : (
-                  <div className="inline-block bg-black/40 px-2.5 py-1 rounded-lg text-white/50 text-[10px]">
-                    Lyrics & Captions Overlay
-                  </div>
-                )}
+              <div className="relative z-10 text-center px-2">
+                {(() => {
+                  const relTime = currentTime >= startTime ? currentTime - startTime : currentTime;
+                  const activeCap = captions.find(
+                    (c) => relTime >= c.startTime && relTime <= c.endTime
+                  ) || (captions.length > 0 ? captions[0] : null);
+
+                  if (activeCap) {
+                    return (
+                      <div
+                        dir={activeCap.isRTL ? "rtl" : "ltr"}
+                        className="inline-block bg-black/80 backdrop-blur-md px-3.5 py-1.5 rounded-2xl border border-white/20 text-white font-extrabold text-xs shadow-2xl transition-all"
+                      >
+                        {activeCap.text}
+                      </div>
+                    );
+                  }
+
+                  return (
+                    <div className="inline-block bg-black/40 px-2.5 py-1 rounded-lg text-white/50 text-[10px]">
+                      Lyrics & Captions Overlay
+                    </div>
+                  );
+                })()}
               </div>
 
               {/* Track Meta */}
@@ -450,6 +427,7 @@ export default function CreateWorkspacePage() {
                 <span className="text-rose-400 font-mono font-bold">{formatTime(currentTime)} / {formatTime(selectedDuration)}</span>
               </div>
             </div>
+
 
             {/* In-Canvas Mini Playback Pill */}
             <div className="flex items-center justify-center gap-3 pt-1">

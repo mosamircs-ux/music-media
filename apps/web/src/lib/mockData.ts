@@ -308,7 +308,11 @@ export const MOCK_PROJECTS: Project[] = [
         startTime: 0,
         endTime: 4,
         text: "LIGHTS FLASH ACROSS THE GRID ⚡",
-        style: { position: "bottom", animation: "pop", fontSize: 44, textColor: "#ffffff" },
+        style: "Neon",
+        animation: "Pop",
+        position: "bottom",
+        fontSize: 44,
+        color: "#ffffff",
       },
       {
         id: "cap-2",
@@ -316,7 +320,11 @@ export const MOCK_PROJECTS: Project[] = [
         startTime: 5,
         endTime: 9,
         text: "SPEED OF SOUND IN THE NIGHT",
-        style: { position: "bottom", animation: "pop", fontSize: 44, textColor: "#f43f5e" },
+        style: "Neon",
+        animation: "Pop",
+        position: "bottom",
+        fontSize: 44,
+        color: "#f43f5e",
       },
     ],
     scenes: [
@@ -333,7 +341,7 @@ export const MOCK_PROJECTS: Project[] = [
       {
         id: "sc-2",
         projectId: "proj-101",
-        prompt: "Cyberpunk rider looking at holographic city skyscraper skyline",
+        prompt: "Cyberpunk city skyline with neon billboards reflecting in wet asphalt",
         visualStyle: "Cinematic",
         imageUrl: "https://images.unsplash.com/photo-1508700115892-45ecd05ae2ad?auto=format&fit=crop&w=600&q=80",
         order: 1,
@@ -375,8 +383,13 @@ export const MOCK_PROJECTS: Project[] = [
         startTime: 0,
         endTime: 6,
         text: "Just you, your thoughts, and the rain ☕",
-        style: { position: "center", animation: "fade", fontSize: 40, textColor: "#fed7aa" },
+        style: "Minimal",
+        animation: "Fade",
+        position: "center",
+        fontSize: 40,
+        color: "#fed7aa",
       },
+
     ],
     scenes: [
       {

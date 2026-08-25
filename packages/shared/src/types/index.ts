@@ -129,9 +129,36 @@ export interface TrackSelection {
  * Captions & Timing
  */
 export type CaptionPosition = "top" | "center" | "bottom";
-export type CaptionAnimation = "none" | "fade" | "pop" | "typewriter" | "karaoke" | "bounce";
+
+export type CaptionPresetStyle =
+  | "Modern"
+  | "Minimal"
+  | "Karaoke"
+  | "Cinematic"
+  | "Neon"
+  | "Bold"
+  | "Typewriter"
+  | "Elegant";
+
+export type CaptionAnimation =
+  | "Fade"
+  | "Slide Up"
+  | "Slide Down"
+  | "Pop"
+  | "Typewriter"
+  | "Word-by-word"
+  | "Karaoke"
+  | "none"
+  | "fade"
+  | "pop"
+  | "typewriter"
+  | "karaoke"
+  | "slide_up"
+  | "slide_down"
+  | "word_by_word";
+
 export type CaptionAlignment = "left" | "center" | "right";
-export type CaptionFontWeight = "normal" | "medium" | "semibold" | "bold" | "extrabold";
+export type CaptionFontWeight = "normal" | "medium" | "semibold" | "bold" | "extrabold" | "black";
 
 export interface CaptionStyle {
   fontFamily: string;
@@ -139,22 +166,59 @@ export interface CaptionStyle {
   fontWeight: CaptionFontWeight;
   alignment: CaptionAlignment;
   textColor: string;
+  color?: string; // alias for textColor
   backgroundColor?: string;
+  background?: string; // alias for backgroundColor
   strokeColor?: string;
   strokeWidth?: number;
   position: CaptionPosition;
   animation: CaptionAnimation;
+  stylePreset?: CaptionPresetStyle;
+  style?: CaptionPresetStyle; // alias for stylePreset
   textTransform?: "uppercase" | "lowercase" | "capitalize" | "none";
+  isRTL?: boolean;
 }
 
 export interface Caption {
   id: string;
   projectId: string;
-  startTime: number; // relative to selection start (0-based)
-  endTime: number;
+  startTime: number; // relative to selection start (in seconds)
+  endTime: number;   // relative to selection start (in seconds)
   text: string;
-  style?: Partial<CaptionStyle>;
+  style?: CaptionPresetStyle;
+  animation?: CaptionAnimation;
+  position?: CaptionPosition;
+  fontFamily?: string;
+  fontSize?: number;
+  fontWeight?: CaptionFontWeight;
+  color?: string;
+  background?: string;
+  alignment?: CaptionAlignment;
+  isRTL?: boolean;
+  styleConfig?: Partial<CaptionStyle>;
 }
+
+export interface CaptionGenerationOptions {
+  language?: string;
+  style?: CaptionPresetStyle;
+  maxWordsPerCaption?: number;
+  duration?: number;
+  bpm?: number;
+}
+
+export interface AutoCaptionResult {
+  captions: Caption[];
+  provider: string;
+  language: string;
+  confidence?: number;
+}
+
+export interface AutoCaptionProvider {
+  readonly id: string;
+  readonly name: string;
+  generateCaptions(track: NormalizedTrack, options?: CaptionGenerationOptions): Promise<AutoCaptionResult>;
+}
+
 
 /**
  * AI Visual Styles & Scene Generation

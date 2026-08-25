@@ -19,8 +19,6 @@ import {
   Button,
   Input,
   Badge,
-  Slider,
-  Select,
   Dialog,
   DialogContent,
   DialogHeader,
@@ -34,17 +32,14 @@ import {
   formatTime,
   type VisualStyle,
   type TransitionType,
-  type CaptionPosition,
-  type CaptionAnimation,
-  type CaptionFontWeight,
 } from "@musicmotion/shared";
 
 import { MOCK_TRACKS } from "@/lib/mockData";
 import { useRouter } from "@/i18n/routing";
 import { AudioTimelineEditor } from "@/components/AudioTimelineEditor";
+import { CaptionEditor } from "@/components/CaptionEditor";
 
 export default function ProjectEditorPage() {
-
   const t = useTranslations("editor");
   const router = useRouter();
 
@@ -56,9 +51,6 @@ export default function ProjectEditorPage() {
     isPlaying,
     currentTime,
     updateSelection,
-    addCaption,
-    updateCaption,
-    removeCaption,
     addScene,
     removeScene,
     setIsPlaying,
@@ -69,8 +61,8 @@ export default function ProjectEditorPage() {
     "music" | "captions" | "visuals" | "scenes" | "style" | "transitions" | "export"
   >("captions");
 
-  const [selectedCaptionId, setSelectedCaptionId] = React.useState<string | null>(null);
   const [newScenePrompt, setNewScenePrompt] = React.useState("");
+
   const [selectedStyle, setSelectedStyle] = React.useState<VisualStyle>("Cinematic");
   const [isEnhancing, setIsEnhancing] = React.useState(false);
 
@@ -101,9 +93,8 @@ export default function ProjectEditorPage() {
     return () => clearInterval(interval);
   }, [isPlaying, duration, setCurrentTime]);
 
-  const activeCaption = captions.find((c) => c.id === selectedCaptionId) || captions[0];
-
   const handleEnhancePrompt = () => {
+
     if (!newScenePrompt.trim()) return;
     setIsEnhancing(true);
     setTimeout(() => {
@@ -256,254 +247,13 @@ export default function ProjectEditorPage() {
 
           {/* SECTION 2: CAPTIONS */}
           {activeSection === "captions" && (
-            <div className="space-y-4">
-              <div className="flex items-center justify-between">
-                <h3 className="text-sm font-bold text-foreground">Caption & Lyric Editor</h3>
-                <Button
-                  variant="gradient"
-                  size="sm"
-                  onClick={() => addCaption("New Caption Beat ⚡", 0, 4)}
-                  className="rounded-xl text-xs font-bold"
-                >
-                  <Plus className="h-3.5 w-3.5 mr-1" /> Add
-                </Button>
-              </div>
-
-              {/* Caption List */}
-              <div className="flex gap-2 overflow-x-auto pb-2">
-                {captions.map((cap, i) => (
-                  <button
-                    key={cap.id}
-                    onClick={() => setSelectedCaptionId(cap.id)}
-                    className={`px-3 py-1.5 rounded-xl text-xs font-bold border transition-all whitespace-nowrap ${
-                      (selectedCaptionId === cap.id || (!selectedCaptionId && i === 0))
-                        ? "border-rose-500 bg-rose-500/10 text-rose-300"
-                        : "border-white/5 bg-secondary/40 text-muted-foreground"
-                    }`}
-                  >
-                    #{i + 1} {cap.text.slice(0, 10)}...
-                  </button>
-                ))}
-              </div>
-
-              {activeCaption && (
-                <div className="p-4 rounded-2xl bg-secondary/30 border border-white/5 space-y-4 text-xs">
-                  <div>
-                    <label className="font-semibold text-muted-foreground block mb-1">Caption / Lyric Text</label>
-                    <Input
-                      value={activeCaption.text}
-                      onChange={(e) => updateCaption(activeCaption.id, { text: e.target.value })}
-                      className="h-9 bg-background/80"
-                    />
-                  </div>
-
-                  {/* Timing Offsets */}
-                  <div className="grid grid-cols-2 gap-3">
-                    <div>
-                      <label className="font-semibold text-muted-foreground block mb-1">Start Time (s)</label>
-                      <Input
-                        type="number"
-                        step="0.1"
-                        min="0"
-                        max={duration}
-                        value={activeCaption.startTime}
-                        onChange={(e) => updateCaption(activeCaption.id, { startTime: Number(e.target.value) })}
-                        className="h-8 bg-background/80"
-                      />
-                    </div>
-                    <div>
-                      <label className="font-semibold text-muted-foreground block mb-1">End Time (s)</label>
-                      <Input
-                        type="number"
-                        step="0.1"
-                        min={activeCaption.startTime + 0.5}
-                        max={duration}
-                        value={activeCaption.endTime}
-                        onChange={(e) => updateCaption(activeCaption.id, { endTime: Number(e.target.value) })}
-                        className="h-8 bg-background/80"
-                      />
-                    </div>
-                  </div>
-
-                  {/* Typography & Animation */}
-                  <div className="grid grid-cols-2 gap-3">
-                    <div>
-                      <label className="font-semibold text-muted-foreground block mb-1">Font Family</label>
-                      <Select
-                        value={activeCaption.style?.fontFamily || "Inter"}
-                        onChange={(val) =>
-                          updateCaption(activeCaption.id, {
-                            style: { ...activeCaption.style, fontFamily: val },
-                          })
-                        }
-                        options={[
-                          { value: "Inter", label: "Inter (Modern Sans)" },
-                          { value: "Impact", label: "Impact (Bold Pop)" },
-                          { value: "Montserrat", label: "Montserrat (Clean)" },
-                          { value: "Outfit", label: "Outfit (Dynamic)" },
-                          { value: "Playfair Display", label: "Playfair (Serif)" },
-                        ]}
-                      />
-                    </div>
-                    <div>
-                      <label className="font-semibold text-muted-foreground block mb-1">Animation Effect</label>
-                      <Select
-                        value={activeCaption.style?.animation || "pop"}
-                        onChange={(val) =>
-                          updateCaption(activeCaption.id, {
-                            style: { ...activeCaption.style, animation: val as CaptionAnimation },
-                          })
-                        }
-                        options={[
-                          { value: "pop", label: "Pop Spring" },
-                          { value: "karaoke", label: "Karaoke Highlight" },
-                          { value: "typewriter", label: "Typewriter" },
-                          { value: "fade", label: "Smooth Fade" },
-                          { value: "bounce", label: "Bounce Jump" },
-                          { value: "none", label: "None (Static)" },
-                        ]}
-                      />
-                    </div>
-                  </div>
-
-                  {/* Weight & Alignment */}
-                  <div className="grid grid-cols-2 gap-3">
-                    <div>
-                      <label className="font-semibold text-muted-foreground block mb-1">Font Weight</label>
-                      <Select
-                        value={activeCaption.style?.fontWeight || "bold"}
-                        onChange={(val) =>
-                          updateCaption(activeCaption.id, {
-                            style: { ...activeCaption.style, fontWeight: val as CaptionFontWeight },
-                          })
-                        }
-                        options={[
-                          { value: "normal", label: "Normal (400)" },
-                          { value: "medium", label: "Medium (500)" },
-                          { value: "semibold", label: "Semibold (600)" },
-                          { value: "bold", label: "Bold (700)" },
-                          { value: "extrabold", label: "Extrabold (800)" },
-                        ]}
-                      />
-                    </div>
-                    <div>
-                      <label className="font-semibold text-muted-foreground block mb-1">Text Alignment</label>
-                      <div className="grid grid-cols-3 gap-1 pt-0.5">
-                        {(["left", "center", "right"] as const).map((align) => (
-                          <button
-                            key={align}
-                            type="button"
-                            onClick={() =>
-                              updateCaption(activeCaption.id, {
-                                style: { ...activeCaption.style, alignment: align },
-                              })
-                            }
-                            className={`py-1.5 rounded-lg text-xs capitalize font-bold border transition-all ${
-                              (activeCaption.style?.alignment || "center") === align
-                                ? "border-rose-500 bg-rose-500/20 text-rose-300"
-                                : "border-white/5 bg-secondary/40 text-muted-foreground"
-                            }`}
-                          >
-                            {align}
-                          </button>
-                        ))}
-                      </div>
-                    </div>
-                  </div>
-
-                  {/* Position & Size */}
-                  <div className="grid grid-cols-2 gap-3">
-                    <div>
-                      <label className="font-semibold text-muted-foreground block mb-1">Vertical Position</label>
-                      <Select
-                        value={activeCaption.style?.position || "bottom"}
-                        onChange={(val) =>
-                          updateCaption(activeCaption.id, {
-                            style: { ...activeCaption.style, position: val as CaptionPosition },
-                          })
-                        }
-                        options={[
-                          { value: "bottom", label: "Bottom (Standard)" },
-                          { value: "center", label: "Center Stage" },
-                          { value: "top", label: "Top Header" },
-                        ]}
-                      />
-                    </div>
-                    <div>
-                      <label className="font-semibold text-muted-foreground block mb-1">Font Size ({activeCaption.style?.fontSize || 44}px)</label>
-                      <Slider
-                        value={activeCaption.style?.fontSize || 44}
-                        min={20}
-                        max={72}
-                        step={2}
-                        onChange={(val) =>
-                          updateCaption(activeCaption.id, {
-                            style: { ...activeCaption.style, fontSize: val },
-                          })
-                        }
-                        showValue
-                      />
-                    </div>
-                  </div>
-
-                  {/* Color & Background Presets */}
-                  <div className="grid grid-cols-2 gap-3 pt-1">
-                    <div>
-                      <label className="font-semibold text-muted-foreground block mb-1.5">Text Color</label>
-                      <div className="flex items-center gap-1.5">
-                        {["#ffffff", "#f43f5e", "#a855f7", "#38bdf8", "#facc15"].map((col) => (
-                          <button
-                            key={col}
-                            type="button"
-                            onClick={() =>
-                              updateCaption(activeCaption.id, {
-                                style: { ...activeCaption.style, textColor: col },
-                              })
-                            }
-                            className="h-6 w-6 rounded-full border border-white/20 transition-transform hover:scale-110"
-                            style={{ backgroundColor: col }}
-                          />
-                        ))}
-                      </div>
-                    </div>
-                    <div>
-                      <label className="font-semibold text-muted-foreground block mb-1.5">Background Style</label>
-                      <div className="flex items-center gap-1.5">
-                        {[
-                          { val: "rgba(0,0,0,0.75)", bg: "bg-black/75" },
-                          { val: "rgba(244,63,94,0.3)", bg: "bg-rose-500/30" },
-                          { val: "rgba(168,85,247,0.3)", bg: "bg-purple-500/30" },
-                          { val: "transparent", bg: "bg-transparent border border-white/30" },
-                        ].map((b, idx) => (
-                          <button
-                            key={idx}
-                            type="button"
-                            onClick={() =>
-                              updateCaption(activeCaption.id, {
-                                style: { ...activeCaption.style, backgroundColor: b.val },
-                              })
-                            }
-                            className={`h-6 w-6 rounded-lg ${b.bg} transition-transform hover:scale-110`}
-                          />
-                        ))}
-                      </div>
-                    </div>
-                  </div>
-
-                  <div className="flex items-center justify-between pt-3 border-t border-white/5">
-                    <span className="text-[10px] text-muted-foreground font-mono">ID: {activeCaption.id.slice(0, 8)}</span>
-                    <button
-                      type="button"
-                      onClick={() => removeCaption(activeCaption.id)}
-                      className="text-[11px] text-rose-400 hover:text-rose-300 font-semibold flex items-center gap-1"
-                    >
-                      <Trash2 className="h-3.5 w-3.5" /> Delete Caption
-                    </button>
-                  </div>
-                </div>
-              )}
-            </div>
+            <CaptionEditor
+              track={activeTrack}
+              currentTime={currentTime}
+              totalDuration={duration}
+            />
           )}
+
 
           {/* SECTION 3: VISUALS */}
           {activeSection === "visuals" && (

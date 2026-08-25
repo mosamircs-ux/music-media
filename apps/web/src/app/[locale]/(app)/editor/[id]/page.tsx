@@ -367,8 +367,9 @@ export default function EditorStudioPage() {
                         <span className="text-xs font-semibold text-foreground">{cap.text}</span>
                         <div className="flex items-center gap-2">
                           <Badge variant="accent" className="text-[10px]">
-                            {cap.style?.animation || "pop"}
+                            {cap.animation || cap.style || "pop"}
                           </Badge>
+
                           <button
                             onClick={() => removeCaption(cap.id)}
                             className="text-muted-foreground hover:text-rose-500 transition-colors p-1"

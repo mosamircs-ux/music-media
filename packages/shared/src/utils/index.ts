@@ -186,4 +186,125 @@ export function framesToSeconds(frames: number, fps: number): number {
   return frames / fps;
 }
 
+/**
+ * Detects if a text string is Arabic/Hebrew/RTL
+ */
+export function isRTLText(text: string): boolean {
+  if (!text || typeof text !== "string") return false;
+  // Arabic, Hebrew, Syriac, Thaana, Samaritan, Mandaic Unicode blocks
+  const rtlRegex = /[\u0591-\u07FF\uFB1D-\uFDFD\uFE70-\uFEFC]/;
+  return rtlRegex.test(text);
+}
+
+/**
+ * Splits a caption into two parts at a specified time or midpoint
+ */
+export function splitCaption<
+  T extends { id: string; projectId: string; text: string; startTime: number; endTime: number; isRTL?: boolean },
+>(caption: T, splitTime?: number): [T, T] {
+  const duration = caption.endTime - caption.startTime;
+  const effectiveSplitTime =
+    splitTime !== undefined && splitTime > caption.startTime && splitTime < caption.endTime
+      ? splitTime
+      : caption.startTime + duration / 2;
+
+  const words = caption.text.trim().split(/\s+/);
+  let text1 = caption.text;
+  let text2 = caption.text;
+
+  if (words.length > 1) {
+    const midWord = Math.floor(words.length / 2);
+    text1 = words.slice(0, midWord).join(" ");
+    text2 = words.slice(midWord).join(" ");
+  } else {
+    text1 = `${caption.text} (1)`;
+    text2 = `${caption.text} (2)`;
+  }
+
+  const cap1: T = {
+    ...caption,
+    id: generateId(),
+    text: text1,
+    startTime: Math.round(caption.startTime * 1000) / 1000,
+    endTime: Math.round(effectiveSplitTime * 1000) / 1000,
+    isRTL: isRTLText(text1),
+  };
+
+  const cap2: T = {
+    ...caption,
+    id: generateId(),
+    text: text2,
+    startTime: Math.round(effectiveSplitTime * 1000) / 1000,
+    endTime: Math.round(caption.endTime * 1000) / 1000,
+    isRTL: isRTLText(text2),
+  };
+
+  return [cap1, cap2];
+}
+
+/**
+ * Merges two adjacent captions into a single continuous caption
+ */
+export function mergeCaptions<
+  T extends { id: string; projectId: string; text: string; startTime: number; endTime: number; isRTL?: boolean },
+>(caption1: T, caption2: T): T {
+  const first = caption1.startTime <= caption2.startTime ? caption1 : caption2;
+  const second = caption1.startTime <= caption2.startTime ? caption2 : caption1;
+  const mergedText = `${first.text} ${second.text}`.trim();
+
+  return {
+    ...first,
+    id: generateId(),
+    text: mergedText,
+    startTime: Math.min(first.startTime, second.startTime),
+    endTime: Math.max(first.endTime, second.endTime),
+    isRTL: isRTLText(mergedText),
+  };
+}
+
+/**
+ * Duplicates a caption with an optional forward time offset
+ */
+export function duplicateCaption<
+  T extends { id: string; projectId: string; text: string; startTime: number; endTime: number; isRTL?: boolean },
+>(caption: T, timeOffset = 0.5): T {
+  const duration = caption.endTime - caption.startTime;
+  const newStart = caption.endTime + timeOffset;
+  const newEnd = newStart + duration;
+
+  return {
+    ...caption,
+    id: generateId(),
+    startTime: Math.round(newStart * 1000) / 1000,
+    endTime: Math.round(newEnd * 1000) / 1000,
+    isRTL: isRTLText(caption.text),
+  };
+}
+
+
+/**
+ * Validates and sorts a list of captions within total composition duration
+ */
+export function validateCaptionTimings<T extends { startTime: number; endTime: number }>(
+  captions: T[],
+  totalDuration: number
+): T[] {
+  const safeTotal = Math.max(1, totalDuration || 60);
+
+  return [...captions]
+    .map((c) => {
+      const start = clamp(c.startTime, 0, safeTotal);
+      let end = clamp(c.endTime, start + 0.2, safeTotal);
+      if (end <= start) end = Math.min(safeTotal, start + 0.5);
+
+      return {
+        ...c,
+        startTime: Math.round(start * 1000) / 1000,
+        endTime: Math.round(end * 1000) / 1000,
+      };
+    })
+    .sort((a, b) => a.startTime - b.startTime);
+}
+
+
 
